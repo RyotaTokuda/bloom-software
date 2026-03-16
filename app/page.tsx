@@ -1,65 +1,135 @@
-import Image from "next/image";
+import Link from "next/link";
+
+const SERVICES = [
+  {
+    emoji: "🅿️",
+    name: "駐車料金リーダー",
+    description: "駐車場の料金看板を撮影するだけで料金ルールを自動解析。今から何時間停めたらいくらかを即座に確認できます。",
+    status: "released" as const,
+    statusLabel: "公開中",
+    cardClass: "bg-blue-50 border-blue-100",
+    badgeClass: "bg-blue-600 text-white",
+  },
+  {
+    emoji: "📋",
+    name: "副業申請の下準備アプリ",
+    description: "副業・兼業を始める際の申請書類の準備をサポート。必要な情報を整理してスムーズに申請できるようにします。",
+    status: "soon" as const,
+    statusLabel: "Coming Soon",
+    cardClass: "bg-gray-50 border-gray-100",
+    badgeClass: "bg-gray-300 text-gray-600",
+  },
+  {
+    emoji: "🗺️",
+    name: "街の危険箇所・通行しづらい場所投稿アプリ",
+    description: "道路の段差・狭い歩道・危険な交差点など、街で見つけた困りごとをみんなで共有して安全な街づくりに貢献します。",
+    status: "soon" as const,
+    statusLabel: "Coming Soon",
+    cardClass: "bg-gray-50 border-gray-100",
+    badgeClass: "bg-gray-300 text-gray-600",
+  },
+  {
+    emoji: "🧾",
+    name: "証憑ボックスアプリ",
+    description: "領収書・レシート・請求書をスマホで撮影して管理。確定申告や経費精算の時期に慌てないための整理ツールです。",
+    status: "soon" as const,
+    statusLabel: "Coming Soon",
+    cardClass: "bg-gray-50 border-gray-100",
+    badgeClass: "bg-gray-300 text-gray-600",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+    <div className="min-h-screen flex flex-col">
+      {/* ヘッダー */}
+      <header className="border-b border-gray-100 px-6 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🌸</span>
+            <span className="text-base font-bold tracking-tight">Bloom Software</span>
+          </div>
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="mailto:bloomsoftware.info@gmail.com"
+            className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+            お問い合わせ
           </a>
         </div>
+      </header>
+
+      <main className="flex-1">
+        {/* ヒーロー */}
+        <section className="px-6 py-20 text-center bg-gradient-to-b from-emerald-50 to-white">
+          <div className="max-w-xl mx-auto">
+            <p className="text-xs font-semibold uppercase tracking-widest text-emerald-600 mb-4">
+              個人開発アプリ
+            </p>
+            <h1 className="text-4xl font-bold leading-tight mb-4">
+              日常を、<br />
+              <span className="text-emerald-600">ちょっと豊かに。</span>
+            </h1>
+            <p className="text-gray-500 leading-relaxed">
+              ちょっとした不便を解消する、シンプルで使いやすいスマホアプリを作っています。
+            </p>
+          </div>
+        </section>
+
+        {/* サービス一覧 */}
+        <section className="px-6 py-16">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-8">Apps</p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {SERVICES.map((s) => (
+                <div
+                  key={s.name}
+                  className={`rounded-2xl border p-6 ${s.cardClass} ${s.status === "soon" ? "opacity-60" : ""}`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="text-3xl">{s.emoji}</span>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.badgeClass}`}>
+                      {s.statusLabel}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2 leading-snug text-sm">{s.name}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{s.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* お問い合わせ */}
+        <section className="px-6 py-16 bg-gray-50">
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Contact</p>
+            <p className="text-gray-600 mb-6 text-sm">
+              ご意見・ご要望・バグ報告などはメールにてお気軽にどうぞ。
+            </p>
+            <a
+              href="mailto:bloomsoftware.info@gmail.com"
+              className="inline-block bg-gray-900 text-white text-sm font-medium px-6 py-3 rounded-full hover:bg-gray-700 transition-colors"
+            >
+              bloomsoftware.info@gmail.com
+            </a>
+          </div>
+        </section>
       </main>
+
+      {/* フッター */}
+      <footer className="border-t border-gray-100 px-6 py-8">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
+          <span>© {new Date().getFullYear()} Bloom Software</span>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:text-gray-600 transition-colors">
+              プライバシーポリシー
+            </Link>
+            <Link href="/terms" className="hover:text-gray-600 transition-colors">
+              利用規約
+            </Link>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
