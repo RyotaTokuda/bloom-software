@@ -46,6 +46,15 @@ const SERVICES = [
     cardClass: "bg-gray-50 border-gray-100",
     badgeClass: "bg-gray-300 text-gray-600",
   },
+  {
+    emoji: "🚗",
+    name: "愛車台帳",
+    description: "整備記録・給油・維持費をまとめて管理。オイル交換や車検の通知から、売却時に使える整備履歴PDFの出力まで、愛車ライフを一冊に。",
+    status: "soon" as const,
+    statusLabel: "Coming Soon",
+    cardClass: "bg-gray-50 border-gray-100",
+    badgeClass: "bg-gray-300 text-gray-600",
+  },
 ];
 
 export default function Home() {
