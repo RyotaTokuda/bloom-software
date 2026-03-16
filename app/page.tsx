@@ -55,6 +55,15 @@ const SERVICES = [
     cardClass: "bg-gray-50 border-gray-100",
     badgeClass: "bg-gray-300 text-gray-600",
   },
+  {
+    emoji: "🧮",
+    name: "車の維持費シミュレーター",
+    description: "購入前に総額を試算。ローン・保険・駐車場・燃料・車検などをまとめて入力して、月額・年額・5年総額を即座に比較。複数車種を並べて検討できます。",
+    status: "soon" as const,
+    statusLabel: "Coming Soon",
+    cardClass: "bg-gray-50 border-gray-100",
+    badgeClass: "bg-gray-300 text-gray-600",
+  },
 ];
 
 export default function Home() {
