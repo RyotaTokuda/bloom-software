@@ -11,6 +11,15 @@ const SERVICES = [
     badgeClass: "bg-blue-600 text-white",
   },
   {
+    emoji: "🔄",
+    name: "ローカルファイル変換",
+    description: "HEIC・WebP・動画など、あらゆるファイル変換をブラウザ内だけで完結。ファイルはサーバーに送られないので、個人情報や機密ファイルも安心して変換できます。",
+    status: "soon" as const,
+    statusLabel: "Coming Soon",
+    cardClass: "bg-gray-50 border-gray-100",
+    badgeClass: "bg-gray-300 text-gray-600",
+  },
+  {
     emoji: "📋",
     name: "副業申請の下準備アプリ",
     description: "副業・兼業を始める際の申請書類の準備をサポート。必要な情報を整理してスムーズに申請できるようにします。",
