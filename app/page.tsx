@@ -14,10 +14,11 @@ const SERVICES = [
     emoji: "🔄",
     name: "ローカルファイル変換",
     description: "HEIC・WebP・動画など、あらゆるファイル変換をブラウザ内だけで完結。ファイルはサーバーに送られないので、個人情報や機密ファイルも安心して変換できます。",
-    status: "soon" as const,
-    statusLabel: "Coming Soon",
-    cardClass: "bg-gray-50 border-gray-100",
-    badgeClass: "bg-gray-300 text-gray-600",
+    status: "released" as const,
+    statusLabel: "公開中",
+    href: "https://file-converter-beige.vercel.app",
+    cardClass: "bg-emerald-50 border-emerald-100",
+    badgeClass: "bg-emerald-600 text-white",
   },
   {
     emoji: "📋",
@@ -116,21 +117,36 @@ export default function Home() {
           <div className="max-w-4xl mx-auto">
             <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-8">Apps</p>
             <div className="grid gap-4 sm:grid-cols-2">
-              {SERVICES.map((s) => (
-                <div
-                  key={s.name}
-                  className={`rounded-2xl border p-6 ${s.cardClass} ${s.status === "soon" ? "opacity-60" : ""}`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <span className="text-3xl">{s.emoji}</span>
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.badgeClass}`}>
-                      {s.statusLabel}
-                    </span>
+              {SERVICES.map((s) => {
+                const inner = (
+                  <>
+                    <div className="flex items-start justify-between mb-3">
+                      <span className="text-3xl">{s.emoji}</span>
+                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${s.badgeClass}`}>
+                        {s.statusLabel}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-gray-900 mb-2 leading-snug text-sm">{s.name}</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">{s.description}</p>
+                  </>
+                );
+                const baseClass = `rounded-2xl border p-6 ${s.cardClass} ${s.status === "soon" ? "opacity-60" : ""}`;
+                return "href" in s ? (
+                  <a
+                    key={s.name}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`${baseClass} block hover:shadow-md transition-shadow`}
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <div key={s.name} className={baseClass}>
+                    {inner}
                   </div>
-                  <h3 className="font-bold text-gray-900 mb-2 leading-snug text-sm">{s.name}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{s.description}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
