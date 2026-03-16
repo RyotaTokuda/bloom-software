@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "プライバシーポリシー | Bloom Software",
+  title: "プライバシーポリシー | Mankai Software",
 };
 
 const UPDATED_AT = "2026年3月16日";
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 hover:opacity-70 transition-opacity">
             <span className="text-xl">🌸</span>
-            <span className="text-base font-bold tracking-tight">Bloom Software</span>
+            <span className="text-base font-bold tracking-tight">Mankai Software</span>
           </Link>
         </div>
       </header>
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-base font-bold text-gray-900 mb-3">1. はじめに</h2>
               <p>
-                Bloom Software（以下「当方」）は、提供するスマートフォンアプリケーション（以下「本アプリ」）において、
+                Mankai Software（以下「当方」）は、提供するスマートフォンアプリケーション（以下「本アプリ」）において、
                 ユーザーのプライバシーを尊重し、個人情報の保護に努めます。
                 本プライバシーポリシーは、本アプリが収集する情報とその取り扱いについて説明します。
               </p>
@@ -120,7 +120,7 @@ export default function PrivacyPage() {
 
       <footer className="border-t border-gray-100 px-6 py-8">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-          <span>© {new Date().getFullYear()} Bloom Software</span>
+          <span>© {new Date().getFullYear()} Mankai Software</span>
           <div className="flex gap-6">
             <Link href="/privacy" className="text-gray-600">プライバシーポリシー</Link>
             <Link href="/terms" className="hover:text-gray-600 transition-colors">利用規約</Link>

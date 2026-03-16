@@ -5,15 +5,15 @@ import "./globals.css";
 const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Bloom Software",
+  title: "Mankai Software",
   description: "日常をちょっと豊かにする、スマホアプリを作っています。",
   icons: {
     icon: "/favicon.svg",
   },
   openGraph: {
-    title: "Bloom Software",
+    title: "Mankai Software",
     description: "日常をちょっと豊かにする、スマホアプリを作っています。",
-    siteName: "Bloom Software",
+    siteName: "Mankai Software",
   },
 };
 

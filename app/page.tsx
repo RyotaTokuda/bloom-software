@@ -84,7 +84,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">🌸</span>
-            <span className="text-base font-bold tracking-tight">Bloom Software</span>
+            <span className="text-base font-bold tracking-tight">Mankai Software</span>
           </div>
           <a
             href="mailto:bloomsoftware.info@gmail.com"
@@ -171,7 +171,7 @@ export default function Home() {
       {/* フッター */}
       <footer className="border-t border-gray-100 px-6 py-8">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-          <span>© {new Date().getFullYear()} Bloom Software</span>
+          <span>© {new Date().getFullYear()} Mankai Software</span>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-gray-600 transition-colors">
               プライバシーポリシー
