@@ -142,8 +142,8 @@ export default function PrivacyPage() {
               <h2 className="text-base font-bold text-gray-900 mb-3">10. お問い合わせ</h2>
               <p>本ポリシーに関するご質問・ご意見・個人情報の取り扱いに関するお問い合わせは、以下のメールアドレスにてお受けします。</p>
               <p className="mt-2">
-                <a href="mailto:bloomsoftware.info@gmail.com" className="text-blue-600 underline">
-                  bloomsoftware.info@gmail.com
+                <a href="mailto:mankaisoftware.info@gmail.com" className="text-blue-600 underline">
+                  mankaisoftware.info@gmail.com
                 </a>
               </p>
             </section>

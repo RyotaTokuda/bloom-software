@@ -87,7 +87,7 @@ export default function Home() {
             <span className="text-base font-bold tracking-tight">Mankai Software</span>
           </div>
           <a
-            href="mailto:bloomsoftware.info@gmail.com"
+            href="mailto:mankaisoftware.info@gmail.com"
             className="text-sm text-gray-500 hover:text-gray-900 transition-colors"
           >
             お問い合わせ
@@ -159,10 +159,10 @@ export default function Home() {
               ご意見・ご要望・バグ報告などはメールにてお気軽にどうぞ。
             </p>
             <a
-              href="mailto:bloomsoftware.info@gmail.com"
+              href="mailto:mankaisoftware.info@gmail.com"
               className="inline-block bg-gray-900 text-white text-sm font-medium px-6 py-3 rounded-full hover:bg-gray-700 transition-colors"
             >
-              bloomsoftware.info@gmail.com
+              mankaisoftware.info@gmail.com
             </a>
           </div>
         </section>
