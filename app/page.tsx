@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+const isProduction = process.env.NEXT_PUBLIC_STAGE === "production";
+
 const SERVICES = [
   {
     emoji: "🅿️",
@@ -14,11 +16,11 @@ const SERVICES = [
     emoji: "🔄",
     name: "ローカルファイル変換",
     description: "HEIC・WebP・動画など、あらゆるファイル変換をブラウザ内だけで完結。ファイルはサーバーに送られないので、個人情報や機密ファイルも安心して変換できます。",
-    status: "released" as const,
-    statusLabel: "公開中",
-    href: "https://file-converter-beige.vercel.app",
-    cardClass: "bg-emerald-50 border-emerald-100",
-    badgeClass: "bg-emerald-600 text-white",
+    status: (isProduction ? "wip" : "released") as "wip" | "released",
+    statusLabel: isProduction ? "鋭意開発中" : "公開中",
+    ...(isProduction ? {} : { href: "https://file-converter-beige.vercel.app" }),
+    cardClass: isProduction ? "bg-orange-50 border-orange-100" : "bg-emerald-50 border-emerald-100",
+    badgeClass: isProduction ? "bg-orange-500 text-white" : "bg-emerald-600 text-white",
   },
   {
     emoji: "📋",
