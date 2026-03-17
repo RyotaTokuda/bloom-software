@@ -103,11 +103,11 @@ export default function Home() {
               個人開発アプリ
             </p>
             <h1 className="text-4xl font-bold leading-tight mb-4">
-              日常を、<br />
-              <span className="text-emerald-600">ちょっと豊かに。</span>
+              毎日を、<br />
+              <span className="text-emerald-600">満開に。</span>
             </h1>
             <p className="text-gray-500 leading-relaxed">
-              ちょっとした不便を解消する、シンプルで使いやすいスマホアプリを作っています。
+              ちょっとした不便を解消する、シンプルで使いやすいアプリを作っています。
             </p>
           </div>
         </section>
