@@ -77,7 +77,10 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-base font-bold text-gray-900 mb-3">4. 外国にある第三者への個人情報の提供</h2>
               <p>
-                本サービスは、画像解析のために Google LLC（米国、以下「Google」）が提供するGemini API（生成AIサービス）を利用しており、画像データをGoogleのサーバーへ送信します。これは個人情報保護法第24条に基づく外国にある第三者への提供に該当する場合があります。
+                <strong>本項は「駐車料金リーダー」アプリのみ該当します。</strong>ローカルファイル変換等、サーバーへのデータ送信を行わないサービスには適用されません。
+              </p>
+              <p className="mt-3">
+                駐車料金リーダーは、看板画像の解析のために Google LLC（米国、以下「Google」）が提供するGemini API（生成AIサービス）を利用しており、画像データをGoogleのサーバーへ送信します。これは個人情報保護法第24条に基づく外国にある第三者への提供に該当する場合があります。
               </p>
               <p className="mt-3">Googleは、EUのGDPRをはじめとする国際的な個人情報保護基準に準拠した適切な保護措置を講じています。詳細はGoogleのプライバシーポリシーをご参照ください。</p>
               <p className="mt-3">
@@ -88,7 +91,7 @@ export default function PrivacyPage() {
 
               <h3 className="font-semibold text-gray-800 mt-5 mb-2">4-1. Gemini API（無料枠）のデータ利用に関する重要事項</h3>
               <p>
-                当方は現在、Gemini APIの無料枠を使用しています。Googleの利用規約により、<strong>無料枠で送信されたデータはGoogleのサービス品質向上・AI開発改善に利用される場合があります。</strong>
+                駐車料金リーダーは現在、Gemini APIの無料枠を使用しています。Googleの利用規約により、<strong>無料枠で送信されたデータはGoogleのサービス品質向上・AI開発改善に利用される場合があります。</strong>
                 個人情報・機密情報・プライバシーに関わる内容が映り込んだ画像の送信はお控えください。
               </p>
             </section>
