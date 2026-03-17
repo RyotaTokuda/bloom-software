@@ -1,30 +1,93 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <rect width="100" height="100" rx="22" fill="#fff0f5"/>
-  <!-- 中央の花 -->
-  <g transform="translate(50,50)">
-    <ellipse rx="9" ry="16" fill="#f472b6" transform="rotate(0)"/>
-    <ellipse rx="9" ry="16" fill="#f472b6" transform="rotate(72)"/>
-    <ellipse rx="9" ry="16" fill="#f472b6" transform="rotate(144)"/>
-    <ellipse rx="9" ry="16" fill="#f472b6" transform="rotate(216)"/>
-    <ellipse rx="9" ry="16" fill="#f472b6" transform="rotate(288)"/>
-    <circle r="6" fill="#fbbf24"/>
+
+  <!-- 左上の花 -->
+  <g transform="translate(20,20) scale(0.5)">
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(0)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(72)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(144)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(216)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(288)"/>
+    <circle r="5" fill="#fbbf24"/>
   </g>
-  <!-- 左上の小花 -->
-  <g transform="translate(22,22) scale(0.55)">
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(0)"/>
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(72)"/>
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(144)"/>
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(216)"/>
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(288)"/>
-    <circle r="6" fill="#fbbf24"/>
+
+  <!-- 右上の花 -->
+  <g transform="translate(78,18) scale(0.48)">
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(36)"/>
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(108)"/>
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(180)"/>
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(252)"/>
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(324)"/>
+    <circle r="5" fill="#fbbf24"/>
   </g>
-  <!-- 右下の小花 -->
-  <g transform="translate(78,78) scale(0.55)">
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(36)"/>
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(108)"/>
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(180)"/>
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(252)"/>
-    <ellipse rx="9" ry="16" fill="#fb7185" transform="rotate(324)"/>
-    <circle r="6" fill="#fbbf24"/>
+
+  <!-- 中央の花（大） -->
+  <g transform="translate(50,50) scale(0.72)">
+    <ellipse rx="9" ry="16" fill="#ec4899" transform="rotate(0)"/>
+    <ellipse rx="9" ry="16" fill="#ec4899" transform="rotate(72)"/>
+    <ellipse rx="9" ry="16" fill="#ec4899" transform="rotate(144)"/>
+    <ellipse rx="9" ry="16" fill="#ec4899" transform="rotate(216)"/>
+    <ellipse rx="9" ry="16" fill="#ec4899" transform="rotate(288)"/>
+    <circle r="6" fill="#fde68a"/>
+  </g>
+
+  <!-- 左下の花 -->
+  <g transform="translate(18,78) scale(0.5)">
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(20)"/>
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(92)"/>
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(164)"/>
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(236)"/>
+    <ellipse rx="9" ry="15" fill="#f472b6" transform="rotate(308)"/>
+    <circle r="5" fill="#fbbf24"/>
+  </g>
+
+  <!-- 右下の花 -->
+  <g transform="translate(80,80) scale(0.5)">
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(0)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(72)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(144)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(216)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(288)"/>
+    <circle r="5" fill="#fbbf24"/>
+  </g>
+
+  <!-- 上中央の小花 -->
+  <g transform="translate(50,12) scale(0.35)">
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(0)"/>
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(72)"/>
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(144)"/>
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(216)"/>
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(288)"/>
+    <circle r="5" fill="#fbbf24"/>
+  </g>
+
+  <!-- 下中央の小花 -->
+  <g transform="translate(50,88) scale(0.35)">
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(36)"/>
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(108)"/>
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(180)"/>
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(252)"/>
+    <ellipse rx="9" ry="15" fill="#fb7185" transform="rotate(324)"/>
+    <circle r="5" fill="#fbbf24"/>
+  </g>
+
+  <!-- 左中央の小花 -->
+  <g transform="translate(12,50) scale(0.35)">
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(0)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(72)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(144)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(216)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(288)"/>
+    <circle r="5" fill="#fbbf24"/>
+  </g>
+
+  <!-- 右中央の小花 -->
+  <g transform="translate(88,50) scale(0.35)">
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(36)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(108)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(180)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(252)"/>
+    <ellipse rx="9" ry="15" fill="#fda4c0" transform="rotate(324)"/>
+    <circle r="5" fill="#fbbf24"/>
   </g>
 </svg>
