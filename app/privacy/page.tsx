@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "プライバシーポリシー | Mankai Software",
 };
 
-const UPDATED_AT = "2026年3月16日";
+const UPDATED_AT = "2026年3月17日";
 
 export default function PrivacyPage() {
   return (
@@ -25,38 +25,40 @@ export default function PrivacyPage() {
           <p className="text-sm text-gray-400 mb-10">最終更新日：{UPDATED_AT}</p>
 
           <div className="prose prose-gray max-w-none space-y-8 text-sm leading-7 text-gray-700">
+
             <section>
               <h2 className="text-base font-bold text-gray-900 mb-3">1. はじめに</h2>
               <p>
-                Mankai Software（以下「当方」）は、提供するスマートフォンアプリケーション（以下「本アプリ」）において、
-                ユーザーのプライバシーを尊重し、個人情報の保護に努めます。
-                本プライバシーポリシーは、本アプリが収集する情報とその取り扱いについて説明します。
+                Mankai Software（以下「当方」）は、当方が提供するスマートフォンアプリケーション及びウェブサービス（以下総称して「本サービス」）において、ユーザーのプライバシーを尊重し、個人情報の適切な保護に努めます。
+                本プライバシーポリシーは、本サービスにおける情報の収集・利用・管理方針について説明するものです。
+                本サービスをご利用いただくことで、本ポリシーの内容に同意したものとみなします。
               </p>
             </section>
 
             <section>
               <h2 className="text-base font-bold text-gray-900 mb-3">2. 収集する情報</h2>
-              <h3 className="font-semibold text-gray-800 mb-2">2-1. 端末内に保存される情報</h3>
-              <p>本アプリは、以下のデータをお使いの端末内にのみ保存します。</p>
+
+              <h3 className="font-semibold text-gray-800 mb-2">2-1. 端末内にのみ保存される情報</h3>
+              <p>本サービスの一部は、以下のデータをユーザーの端末内にのみ保存します。</p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
                 <li>解析した駐車場の料金情報（ルールデータ）</li>
-                <li>解析に使用した画像のパス</li>
-                <li>解析履歴（最大件数は設定により異なります）</li>
+                <li>解析に使用した画像のファイルパス</li>
+                <li>解析・利用履歴</li>
                 <li>アプリ内の設定情報</li>
               </ul>
-              <p className="mt-3">これらのデータは端末内の AsyncStorage に保存され、外部サーバーへは送信されません。</p>
+              <p className="mt-3">これらのデータは端末内のストレージにのみ保存され、当方のサーバーへは送信されません。</p>
 
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">2-2. 解析のためにサーバーへ送信される情報</h3>
+              <h3 className="font-semibold text-gray-800 mt-5 mb-2">2-2. 解析のために外部サービスへ送信される情報</h3>
               <p>
-                「看板を読み取る」機能を使用する際、撮影または選択した画像データを
-                当方が運営する解析サーバーへ送信します。
-                この画像データは解析処理にのみ使用され、サーバー上に保存・蓄積されることはありません。
+                「看板を読み取る」等の解析機能をご利用の際、撮影または選択した画像データを、当方が利用する外部AIサービス（後述）へ送信します。
+                この画像には、ナンバープレートや人物等が偶発的に含まれる可能性があります。
+                解析目的以外に当方がこのデータを保存・蓄積することはありません。
               </p>
 
               <h3 className="font-semibold text-gray-800 mt-5 mb-2">2-3. 収集しない情報</h3>
               <p>当方は以下の情報を収集しません。</p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>氏名・住所・電話番号などの個人を特定できる情報</li>
+                <li>氏名・住所・電話番号等の個人を特定できる情報</li>
                 <li>位置情報（GPS）</li>
                 <li>端末の識別情報</li>
                 <li>クレジットカード情報</li>
@@ -66,54 +68,86 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-base font-bold text-gray-900 mb-3">3. カメラおよびフォトライブラリへのアクセス</h2>
               <p>
-                本アプリは、駐車場の料金看板を撮影・選択する機能のために、
-                カメラおよびフォトライブラリへのアクセス許可を求めます。
-                取得した画像は解析目的のみに使用され、無断で外部へ公開・共有することはありません。
+                本サービスの一部は、標識・書類等を撮影・選択する機能のために、カメラおよびフォトライブラリへのアクセス許可を求めます。
+                取得した画像は解析目的のみに使用し、ユーザーの同意なく外部へ公開・共有することはありません。
+                アクセス許可はOS設定からいつでも取り消すことができます。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">4. 第三者サービスの利用</h2>
-              <p>本アプリは、画像解析のために Google の生成 AI サービス（Gemini API）を利用しています。
-              送信した画像データの取り扱いについては、Google のプライバシーポリシーに従います。</p>
-            </section>
-
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">5. 情報の管理</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">4. 外国にある第三者への個人情報の提供</h2>
               <p>
-                端末内に保存されたデータはアプリのアンインストールにより削除されます。
-                ユーザーはアプリ内の設定から解析履歴を削除することができます。
+                本サービスは、画像解析のために Google LLC（米国、以下「Google」）が提供するGemini API（生成AIサービス）を利用しており、画像データをGoogleのサーバーへ送信します。これは個人情報保護法第24条に基づく外国にある第三者への提供に該当する場合があります。
+              </p>
+              <p className="mt-3">Googleは、EUのGDPRをはじめとする国際的な個人情報保護基準に準拠した適切な保護措置を講じています。詳細はGoogleのプライバシーポリシーをご参照ください。</p>
+              <p className="mt-3">
+                <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                  https://policies.google.com/privacy
+                </a>
+              </p>
+
+              <h3 className="font-semibold text-gray-800 mt-5 mb-2">4-1. Gemini API（無料枠）のデータ利用に関する重要事項</h3>
+              <p>
+                当方は現在、Gemini APIの無料枠を使用しています。Googleの利用規約により、<strong>無料枠で送信されたデータはGoogleのサービス品質向上・AI開発改善に利用される場合があります。</strong>
+                個人情報・機密情報・プライバシーに関わる内容が映り込んだ画像の送信はお控えください。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">6. 未成年者の利用</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">5. 情報の利用目的</h2>
+              <p>当方が取得する情報は、以下の目的にのみ使用します。</p>
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>本サービスの機能提供（料金解析・結果表示等）</li>
+                <li>本サービスの品質維持・改善</li>
+                <li>ユーザーからのお問い合わせへの対応</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-base font-bold text-gray-900 mb-3">6. 情報の管理・削除</h2>
               <p>
-                本アプリは13歳未満のお子様を対象としていません。
+                端末内に保存されたデータは、アプリのアンインストールにより削除されます。
+                ユーザーはアプリ内の設定から履歴・保存データを任意に削除することができます。
+                当方のサーバーにはデータを保持しないため、当方によるデータ削除の対応は行いません。
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-base font-bold text-gray-900 mb-3">7. 未成年者の利用</h2>
+              <p>
+                本サービスは13歳未満のお子様を対象としていません。
                 13歳未満のお子様の個人情報を故意に収集することはありません。
+                13歳未満のお子様が本サービスを利用していることが判明した場合、当該データを速やかに削除します。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">7. プライバシーポリシーの変更</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">8. 免責事項</h2>
               <p>
-                当方は、必要に応じて本ポリシーを変更することがあります。
-                変更があった場合は、本ページにて更新日とともに公開します。
-                重要な変更がある場合はアプリ内でも通知します。
+                当方は、本サービスにおける情報の取り扱いについて善意かつ合理的な注意を払いますが、当方の故意または重過失に起因する場合を除き、本サービスの利用に関連してユーザーに生じた損害について責任を負いません。
+                ユーザーが送信した画像データの第三者サービス（Google等）における取り扱いについては、各サービスのプライバシーポリシーが適用され、当方は責任を負いません。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">8. お問い合わせ</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">9. プライバシーポリシーの変更</h2>
               <p>
-                本プライバシーポリシーに関するご質問・ご意見は、以下のメールアドレスにてお受けします。
+                当方は、法令の改正・サービス内容の変更等に伴い、本ポリシーを変更することがあります。
+                重要な変更がある場合は本ページへの掲載およびアプリ内での通知により告知します。
+                変更後に本サービスをご利用いただいた場合、変更後のポリシーに同意したものとみなします。
               </p>
+            </section>
+
+            <section>
+              <h2 className="text-base font-bold text-gray-900 mb-3">10. お問い合わせ</h2>
+              <p>本ポリシーに関するご質問・ご意見・個人情報の取り扱いに関するお問い合わせは、以下のメールアドレスにてお受けします。</p>
               <p className="mt-2">
                 <a href="mailto:bloomsoftware.info@gmail.com" className="text-blue-600 underline">
                   bloomsoftware.info@gmail.com
                 </a>
               </p>
             </section>
+
           </div>
         </div>
       </main>

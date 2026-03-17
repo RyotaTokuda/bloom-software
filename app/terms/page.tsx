@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "利用規約 | Mankai Software",
 };
 
-const UPDATED_AT = "2026年3月16日";
+const UPDATED_AT = "2026年3月17日";
 
 export default function TermsPage() {
   return (
@@ -25,82 +25,120 @@ export default function TermsPage() {
           <p className="text-sm text-gray-400 mb-10">最終更新日：{UPDATED_AT}</p>
 
           <div className="prose prose-gray max-w-none space-y-8 text-sm leading-7 text-gray-700">
+
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">1. はじめに</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第1条（適用）</h2>
               <p>
-                本利用規約（以下「本規約」）は、Mankai Software（以下「当方」）が提供するスマートフォンアプリケーション
-                （以下「本アプリ」）の利用条件を定めるものです。
-                本アプリをご利用いただくことで、本規約に同意したものとみなします。
+                本利用規約（以下「本規約」）は、Mankai Software（以下「当方」）が提供するスマートフォンアプリケーション及びウェブサービス（以下総称して「本サービス」）の利用条件を定めるものです。
+                本サービスをご利用いただくことで、本規約の全条項に同意したものとみなします。
+                同意いただけない場合は、本サービスのご利用をお控えください。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">2. サービスの内容</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第2条（サービスの内容）</h2>
               <p>
-                本アプリは、駐車場の料金看板を撮影し、AI技術を用いて料金ルールを解析・表示する機能を提供します。
-                また、駐車予定時間に応じた概算料金の計算・表示機能を含みます。
+                本サービスは、駐車場の料金看板をAI技術で解析・表示する機能、ファイル変換機能、その他当方が提供する各種機能を含みます。
+                本サービスの内容は予告なく変更・追加・削除されることがあります。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">3. 免責事項</h2>
-              <h3 className="font-semibold text-gray-800 mb-2">3-1. 解析精度について</h3>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第3条（AI解析結果に関する注意事項）</h2>
               <p>
-                本アプリの料金解析はAIによる自動処理であり、看板の状態・撮影条件・料金表記の複雑さ等により、
-                解析結果が実際の料金と異なる場合があります。
-                実際の駐車料金は必ず駐車場の表示をご確認ください。
+                本サービスはGoogle Gemini API等のAI技術を使用して情報を解析しますが、<strong>AI解析結果はあくまで参考情報です。</strong>結果の正確性・完全性・有用性・特定目的への適合性を保証するものではありません。
               </p>
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">3-2. 損害について</h3>
-              <p>
-                本アプリの利用または利用不能により生じた損害（解析誤りによる金銭的損害を含む）について、
-                当方は一切の責任を負いません。本アプリはあくまで参考情報の提供を目的としています。
-              </p>
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">3-3. サービスの継続性について</h3>
-              <p>
-                当方は、予告なくサービスの内容を変更・停止・終了することがあります。
-                これによりユーザーに生じた損害について、当方は責任を負いません。
+              <p className="mt-3">
+                実際の駐車料金・各種情報は必ず現地の表示または公式情報源でご確認ください。AI解析結果に基づいた判断により生じた損害（過払い料金・駐車違反・その他の損失を含む）について、当方は責任を負いません。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">4. 禁止事項</h2>
-              <p>ユーザーは、以下の行為を行ってはなりません。</p>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第4条（禁止事項）</h2>
+              <p>ユーザーは、本サービスの利用にあたり以下の行為を行ってはなりません。</p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>本アプリを違法な目的に使用すること</li>
-                <li>本アプリのリバースエンジニアリング・改ざんを行うこと</li>
-                <li>本アプリのサーバーやネットワークに過度な負荷をかける行為</li>
-                <li>他のユーザーや第三者の権利を侵害する行為</li>
-                <li>その他、当方が不適切と判断する行為</li>
+                <li>法令または公序良俗に違反する行為</li>
+                <li>本サービスのリバースエンジニアリング・逆コンパイル・改ざんを行う行為</li>
+                <li>本サービスのサーバーやネットワークに過大な負荷をかける行為</li>
+                <li>他のユーザーまたは第三者の権利・利益を侵害する行為</li>
+                <li>当方または第三者になりすます行為</li>
+                <li>その他、当方が不適切と合理的に判断する行為</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">5. 知的財産権</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第5条（免責事項）</h2>
+
+              <h3 className="font-semibold text-gray-800 mb-2">5-1. 保証の否認</h3>
               <p>
-                本アプリに関するすべての知的財産権は当方に帰属します。
-                本規約で明示的に許可された範囲を超えて、本アプリを複製・配布・改変することを禁止します。
+                本サービスは現状有姿（as-is）で提供するものであり、当方は、本サービスの完全性・正確性・有用性・安全性・特定目的への適合性について、明示・黙示を問わずいかなる保証も行いません。
+              </p>
+
+              <h3 className="font-semibold text-gray-800 mt-5 mb-2">5-2. 損害賠償の制限</h3>
+              <p>
+                当方の故意または重過失に起因する場合を除き、本サービスの利用または利用不能（不具合・バグ・システム障害・サービス停止等を含む）によってユーザーに生じた損害について、当方は一切の責任を負いません。
+              </p>
+              <p className="mt-3">
+                当方に責任が認められる場合においても、間接損害・特別損害・逸失利益・機会損失については、当方の故意または重過失がある場合を除き、賠償責任を負いません。
+              </p>
+              <p className="mt-3">
+                当方がユーザーに対して損害賠償責任を負う場合における賠償額の上限は、当該損害発生時点において当方がユーザーから受領した金額（無料サービスの場合は金1,000円）とします。
+              </p>
+
+              <h3 className="font-semibold text-gray-800 mt-5 mb-2">5-3. 第三者サービスに関する免責</h3>
+              <p>
+                本サービスはGoogle Gemini API等の第三者サービスを利用しています。これらのサービスの障害・仕様変更・提供終了・データ取り扱いに起因してユーザーに生じた損害について、当方は責任を負いません。
+              </p>
+
+              <h3 className="font-semibold text-gray-800 mt-5 mb-2">5-4. 通信環境・端末に関する免責</h3>
+              <p>
+                本サービスの利用に必要な通信環境・端末はユーザー自身の責任と費用で整備するものとし、これらに起因する損害について当方は責任を負いません。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">6. 規約の変更</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第6条（サービスの変更・停止・終了）</h2>
               <p>
-                当方は、必要に応じて本規約を変更することがあります。
-                変更後の規約は本ページにて公開し、公開時点から効力を生じるものとします。
-                重要な変更がある場合はアプリ内でも通知します。
+                当方は、以下の場合にユーザーへの事前通知なく本サービスの全部または一部を変更・停止・終了することができます。
+              </p>
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>システムの保守・更新を行う場合</li>
+                <li>天災・停電・第三者サービスの障害等、当方の制御が及ばない事由が生じた場合</li>
+                <li>その他、当方が必要と判断した場合</li>
+              </ul>
+              <p className="mt-3">
+                本サービスの変更・停止・終了によりユーザーに生じた損害について、当方の故意または重過失に起因する場合を除き、一切の責任を負いません。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">7. 準拠法・管轄</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第7条（知的財産権）</h2>
+              <p>
+                本サービスに関するすべての知的財産権（著作権・商標権・特許権等）は当方または正当な権利者に帰属します。
+                本規約で明示的に許可された範囲を超えた複製・配布・改変・二次利用を禁止します。
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第8条（規約の変更）</h2>
+              <p>
+                当方は、法令の改正・サービス内容の変更等に応じて、本規約を変更することがあります。
+                変更後の規約は本ページへの掲載をもって効力を生じます。
+                変更後に本サービスをご利用いただいた場合、変更後の規約に同意したものとみなします。
+                重要な変更がある場合はアプリ内または本ウェブサイト上での通知により告知します。
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第9条（準拠法・管轄裁判所）</h2>
               <p>
                 本規約は日本法に準拠して解釈されます。
-                本アプリの利用に関して生じた紛争については、当方の所在地を管轄する裁判所を第一審の専属管轄裁判所とします。
+                本サービスの利用に関して生じた紛争については、当方の所在地を管轄する日本の裁判所を第一審の専属的合意管轄裁判所とします。
               </p>
             </section>
 
             <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">8. お問い合わせ</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3">第10条（お問い合わせ）</h2>
               <p>本規約に関するご質問・ご意見は、以下のメールアドレスにてお受けします。</p>
               <p className="mt-2">
                 <a href="mailto:bloomsoftware.info@gmail.com" className="text-blue-600 underline">
@@ -108,6 +146,7 @@ export default function TermsPage() {
                 </a>
               </p>
             </section>
+
           </div>
         </div>
       </main>
