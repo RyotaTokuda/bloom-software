@@ -1,5 +1,5 @@
 // ============================================================
-// 収入シミュレーション（競合調査ベースの精密試算）
+// Dashboard Data — 個人開発プロジェクト管理
 // ============================================================
 
 export interface RevenueScenario {
@@ -13,9 +13,47 @@ export interface RevenueScenario {
 
 export interface TodoItem {
   task: string;
-  owner: "auto" | "manual"; // auto=システムがやる, manual=オーナーがやる
+  owner: "auto" | "manual";
   priority: "critical" | "high" | "medium" | "low";
-  blocked?: string; // ブロッカーがある場合
+  blocked?: string;
+}
+
+export interface KPI {
+  label: string;
+  target: number;
+  actual: number;
+  unit: string;
+  period: string;
+}
+
+export interface Milestone {
+  label: string;
+  deadline: string;
+  status: "done" | "in_progress" | "upcoming" | "overdue";
+  note?: string;
+}
+
+export interface SystemHealth {
+  name: string;
+  status: "healthy" | "warning" | "error" | "unknown";
+  lastCheck?: string;
+  note?: string;
+}
+
+export interface Blocker {
+  issue: string;
+  impact: string;
+  impactAmount?: string;
+  action: string;
+  owner: "manual" | "auto";
+  estimatedMinutes?: number;
+}
+
+export interface RevenueRoadmap {
+  month: string;
+  target: number;
+  actual: number;
+  breakdown: { source: string; target: number; actual: number }[];
 }
 
 export interface ProjectData {
@@ -24,53 +62,146 @@ export interface ProjectData {
   emoji: string;
   status: "live" | "review" | "dev" | "planned";
   statusLabel: string;
-  progress: number;
-  revenueModel: string;
-  pricing?: string;
-  pricingFunnel?: string;
-  retention?: string;
-  monthlyTarget: number;
-  currentMonthly: number;
-  revenue: RevenueScenario;
-  competitors: { name: string; users: string; pricing: string }[];
-  weakPoints: string[];
+  phase: string;
+
+  kpis: KPI[];
+  milestones: Milestone[];
+  health: SystemHealth[];
+  blockers: Blocker[];
   todos: TodoItem[];
-  metrics: { label: string; value: string; trend?: "up" | "down" | "flat" }[];
-  aiSuggestions: string[];
+  revenueRoadmap: RevenueRoadmap[];
+
+  competitors: { name: string; users: string; pricing: string }[];
+  currentMonthly: number;
+  monthlyTarget: number;
+  revenue: RevenueScenario;
+  revenueModel: string;
 }
 
+// ============================================================
+// プロジェクトデータ
+// ============================================================
+
 export const PROJECTS: ProjectData[] = [
+  // ─── web-media-engine（くらべるラボ）───
+  {
+    id: "web-media-engine",
+    name: "Web Media Engine（くらべるラボ）",
+    emoji: "🔬",
+    status: "live",
+    statusLabel: "稼働中",
+    phase: "Phase 1: 量で当たりを探す（月1-2）",
+    kpis: [
+      { label: "公開記事数", target: 25, actual: 10, unit: "本", period: "Phase 1目標" },
+      { label: "月間検索表示", target: 8000, actual: 0, unit: "回", period: "月間" },
+      { label: "月間検索クリック", target: 250, actual: 0, unit: "回", period: "月間" },
+      { label: "検索CTR", target: 3.2, actual: 0, unit: "%", period: "月間" },
+      { label: "アフィクリック数", target: 30, actual: 0, unit: "回", period: "月間" },
+      { label: "月間売上", target: 0, actual: 0, unit: "円", period: "月間" },
+    ],
+    milestones: [
+      { label: "リポジトリ・CLI構築", deadline: "2026-03-19", status: "done" },
+      { label: "サイト公開・10記事投入", deadline: "2026-03-19", status: "done" },
+      { label: "ASP登録（A8/もしも）", deadline: "2026-03-19", status: "done" },
+      { label: "ドメイン取得・DNS設定", deadline: "2026-03-19", status: "done" },
+      { label: "Search Console登録", deadline: "2026-03-20", status: "in_progress" },
+      { label: "Cloudflare Analytics設定", deadline: "2026-03-20", status: "in_progress" },
+      { label: "ASP案件提携申請（freee/Notta等）", deadline: "2026-03-22", status: "upcoming" },
+      { label: "X(Twitter)アカウント開設", deadline: "2026-03-25", status: "upcoming" },
+      { label: "25記事到達", deadline: "2026-04-15", status: "upcoming" },
+      { label: "初成果（アフィリエイト1件）", deadline: "2026-04-30", status: "upcoming" },
+      { label: "Phase 2移行判定", deadline: "2026-05-19", status: "upcoming" },
+    ],
+    health: [
+      { name: "GitHub Actions（記事生成）", status: "warning", note: "Gemini API無料枠のRPM制限で失敗あり" },
+      { name: "GitHub Actions（監査/レポート）", status: "healthy" },
+      { name: "Cloudflare Pages", status: "healthy", note: "デプロイ正常" },
+      { name: "Gemini API", status: "warning", note: "日次枠使い切りで429。明日リセット" },
+      { name: "Search Console", status: "unknown", note: "未登録" },
+      { name: "Cloudflare Analytics", status: "unknown", note: "未設定" },
+    ],
+    blockers: [
+      { issue: "Search Console未登録", impact: "KPI計測不可", impactAmount: "検索CTR/表示回数が取れず改善サイクルが回らない", action: "search.google.com/search-console でサイト登録", owner: "manual", estimatedMinutes: 5 },
+      { issue: "Cloudflare Analytics未設定", impact: "PVデータ取得不可", action: "Cloudflareダッシュボードでトークン取得", owner: "manual", estimatedMinutes: 3 },
+      { issue: "ASP案件未提携", impact: "収益化不可", impactAmount: "記事にアフィリリンクを貼れない = 月¥70,500の機会損失", action: "A8/もしもで「freee」「Notta」「Canva」を検索して提携申請", owner: "manual", estimatedMinutes: 15 },
+      { issue: "X未開設", impact: "SNS流入ゼロ", impactAmount: "SEOだけでは月5万達成が厳しい。競合はSEO+SNSの2本柱", action: "X(Twitter)アカウント作成、AIツール情報発信開始", owner: "manual", estimatedMinutes: 10 },
+    ],
+    todos: [
+      { task: "Search Console登録 + サイト認証", owner: "manual", priority: "critical" },
+      { task: "Cloudflare Web Analyticsトークン設定", owner: "manual", priority: "critical" },
+      { task: "A8.netでfreee/会計ソフト案件を提携申請", owner: "manual", priority: "critical" },
+      { task: "もしもでAIツール系案件を提携申請", owner: "manual", priority: "critical" },
+      { task: "X(Twitter)アカウント開設・運用開始", owner: "manual", priority: "high" },
+      { task: "記事の自動生成（毎日3本）", owner: "auto", priority: "high" },
+      { task: "daily-audit: 記事監査・改善候補抽出", owner: "auto", priority: "high" },
+      { task: "weekly-report: 週次KPIレポート", owner: "auto", priority: "high" },
+      { task: "monthly-report: 月次分析", owner: "auto", priority: "medium" },
+    ],
+    revenueRoadmap: [
+      { month: "2026-04", target: 0, actual: 0, breakdown: [{ source: "基盤構築期", target: 0, actual: 0 }] },
+      { month: "2026-05", target: 8000, actual: 0, breakdown: [{ source: "AIツール", target: 5000, actual: 0 }, { source: "Amazon", target: 3000, actual: 0 }] },
+      { month: "2026-06", target: 8000, actual: 0, breakdown: [{ source: "AIツール", target: 5000, actual: 0 }, { source: "Amazon", target: 3000, actual: 0 }] },
+      { month: "2026-07", target: 15000, actual: 0, breakdown: [{ source: "AIツール", target: 8000, actual: 0 }, { source: "会計ソフト", target: 4000, actual: 0 }, { source: "Amazon", target: 3000, actual: 0 }] },
+      { month: "2026-08", target: 15000, actual: 0, breakdown: [{ source: "AIツール", target: 8000, actual: 0 }, { source: "会計ソフト", target: 4000, actual: 0 }, { source: "Amazon", target: 3000, actual: 0 }] },
+      { month: "2026-09", target: 25000, actual: 0, breakdown: [{ source: "AIツール", target: 12000, actual: 0 }, { source: "会計ソフト", target: 8000, actual: 0 }, { source: "Amazon", target: 5000, actual: 0 }] },
+      { month: "2026-10", target: 35000, actual: 0, breakdown: [{ source: "AIツール", target: 15000, actual: 0 }, { source: "会計ソフト", target: 12000, actual: 0 }, { source: "Amazon", target: 8000, actual: 0 }] },
+      { month: "2026-11", target: 50000, actual: 0, breakdown: [{ source: "AIツール", target: 20000, actual: 0 }, { source: "会計ソフト", target: 18000, actual: 0 }, { source: "Amazon", target: 12000, actual: 0 }] },
+    ],
+    competitors: [
+      { name: "WEEL", users: "法人メディア", pricing: "コンサル誘導" },
+      { name: "AIsmiley", users: "500製品掲載", pricing: "資料請求リード" },
+      { name: "マイベスト", users: "数万記事", pricing: "ASPアフィリエイト" },
+      { name: "SHIFT AI TIMES", users: "フォロワー10万", pricing: "コミュニティ販売" },
+    ],
+    currentMonthly: 0,
+    monthlyTarget: 70500,
+    revenue: {
+      bad: 2000,
+      normal: 25000,
+      good: 70000,
+      badNote: "SEOが弱く月間PV3,000以下。アフィリ成果が月1〜2件のみ",
+      normalNote: "月間PV15,000、会計ソフト月1件(¥12,000)+AIツール月3件+Amazon月15件",
+      goodNote: "月間PV40,000、会計ソフト月2件+保険3件+AIツール6件+Amazon30件",
+    },
+    revenueModel: "アフィリエイト（会計ソフト/保険/AI/Amazon）",
+  },
+
+  // ─── note-writer（ゆき）───
   {
     id: "note-writer",
     name: "NOTE Writer（ゆき）",
     emoji: "📝",
     status: "live",
     statusLabel: "稼働中",
-    progress: 85,
-    revenueModel: "有料記事 + マガジン + アフィリエイト",
-    pricing: "有料記事: 300〜500円 / マガジン: 980円 / Amazon: tag=yukikurashi-22",
-    pricingFunnel: "Google検索 → はてな(無料+アフィリ) → NOTE誘導 → 無料記事 → 有料記事 → マガジン",
-    retention: "シリーズ化、ペルソナの一貫性、記事末尾の次回予告",
-    monthlyTarget: 50000,
-    currentMonthly: 0,
-    revenue: {
-      bad: 3000,
-      normal: 15000,
-      good: 50000,
-      badNote: "記事は溜まるがフォロワーが伸びず、有料記事が月10本しか売れない",
-      normalNote: "フォロワー300人、有料記事月50本(CVR1%)、マガジン月5本。はてなアフィリ月2000円",
-      goodNote: "フォロワー800人、有料記事月137本、マガジン月12本。はてなアフィリ月5000円。noteの有料コンテンツ流通額は年127%成長中",
-    },
-    competitors: [
-      { name: "note平均的クリエイター", users: "大多数", pricing: "月0〜5,000円" },
-      { name: "note中堅層（継続発信）", users: "数万人", pricing: "月1万〜5万円" },
-      { name: "noteトップ1000", users: "1,000人", pricing: "平均月126万円" },
+    phase: "Phase 1: 記事蓄積・フォロワー獲得",
+    kpis: [
+      { label: "はてなブログ記事数", target: 20, actual: 9, unit: "本", period: "累計" },
+      { label: "NOTE記事数", target: 15, actual: 7, unit: "本", period: "累計" },
+      { label: "NOTEフォロワー", target: 50, actual: 1, unit: "人", period: "累計" },
+      { label: "NOTE有料記事売上", target: 3000, actual: 0, unit: "円", period: "月間" },
+      { label: "はてなアフィリエイト", target: 1000, actual: 0, unit: "円", period: "月間" },
     ],
-    weakPoints: [
-      "NOTE headless投稿がサーバーで動くか未検証",
-      "X連携がAPI審査落ちで停止中",
-      "SEO流入が立つまで2〜3ヶ月",
-      "記事がまだ9本（目標20本で種まき完了）",
+    milestones: [
+      { label: "はてなブログ・NOTE自動投稿構築", deadline: "2026-03-18", status: "done" },
+      { label: "9記事投入（はてな）", deadline: "2026-03-19", status: "done" },
+      { label: "7記事投入（NOTE）", deadline: "2026-03-19", status: "done" },
+      { label: "ASP登録（A8/もしも）", deadline: "2026-03-20", status: "in_progress" },
+      { label: "はてなブログ20記事到達", deadline: "2026-04-05", status: "upcoming" },
+      { label: "NOTE15記事到達", deadline: "2026-04-05", status: "upcoming" },
+      { label: "NOTEマガジン作成", deadline: "2026-04-10", status: "upcoming" },
+      { label: "NOTEフォロワー50人", deadline: "2026-05-01", status: "upcoming" },
+      { label: "初有料記事売上", deadline: "2026-05-15", status: "upcoming" },
+    ],
+    health: [
+      { name: "GitHub Actions（記事生成）", status: "healthy", note: "毎日3トピック×2記事" },
+      { name: "NOTE headless投稿", status: "warning", note: "サーバー環境で動作未検証" },
+      { name: "はてなブログAPI", status: "healthy" },
+      { name: "Gemini API", status: "warning", note: "日次枠上限あり" },
+    ],
+    blockers: [
+      { issue: "NOTE headless投稿のサーバー検証未完了", impact: "NOTE自動投稿が止まる可能性", action: "GitHub Actions結果を確認、失敗時はxvfb対応", owner: "manual", estimatedMinutes: 15 },
+      { issue: "ASP未登録", impact: "はてなブログにアフィリリンクが貼れない", impactAmount: "月¥1,000〜¥5,000の機会損失", action: "A8.net/もしもでアフィリエイト提携申請", owner: "manual", estimatedMinutes: 10 },
+      { issue: "X連携停止中", impact: "SNS流入ゼロ", impactAmount: "フォロワー獲得速度が大幅に低下", action: "X API再申請 or 手動ツイート週3回", owner: "manual", estimatedMinutes: 10 },
     ],
     todos: [
       { task: "明日のGitHub Actions結果を確認", owner: "manual", priority: "critical" },
@@ -81,112 +212,58 @@ export const PROJECTS: ProjectData[] = [
       { task: "記事の自動投稿（毎日3トピック×2記事）", owner: "auto", priority: "high" },
       { task: "週次PDCA分析（毎週日曜自動）", owner: "auto", priority: "high" },
     ],
-    metrics: [
-      { label: "はてなブログ記事数", value: "9本", trend: "up" },
-      { label: "NOTE記事数", value: "7本", trend: "up" },
-      { label: "NOTEフォロワー", value: "1人", trend: "flat" },
-      { label: "有料記事", value: "1本（300円）", trend: "flat" },
-      { label: "今月売上", value: "¥0", trend: "flat" },
+    revenueRoadmap: [
+      { month: "2026-04", target: 0, actual: 0, breakdown: [{ source: "記事蓄積期", target: 0, actual: 0 }] },
+      { month: "2026-05", target: 3000, actual: 0, breakdown: [{ source: "NOTE有料記事", target: 2000, actual: 0 }, { source: "はてなアフィリ", target: 1000, actual: 0 }] },
+      { month: "2026-06", target: 5000, actual: 0, breakdown: [{ source: "NOTE有料記事", target: 3000, actual: 0 }, { source: "はてなアフィリ", target: 2000, actual: 0 }] },
+      { month: "2026-07", target: 8000, actual: 0, breakdown: [{ source: "NOTE有料記事", target: 5000, actual: 0 }, { source: "はてなアフィリ", target: 3000, actual: 0 }] },
+      { month: "2026-08", target: 10000, actual: 0, breakdown: [{ source: "NOTE有料記事", target: 6000, actual: 0 }, { source: "マガジン", target: 2000, actual: 0 }, { source: "はてなアフィリ", target: 2000, actual: 0 }] },
+      { month: "2026-09", target: 15000, actual: 0, breakdown: [{ source: "NOTE有料記事", target: 8000, actual: 0 }, { source: "マガジン", target: 4000, actual: 0 }, { source: "はてなアフィリ", target: 3000, actual: 0 }] },
     ],
-    aiSuggestions: [
-      "ASP登録が未完了。はてなブログにアフィリリンクを貼れない状態。最優先",
-      "noteの有料コンテンツ市場は年127%成長。早期参入のメリット大",
-      "X連携停止中。手動でもいいので週3回ブログリンクをツイートすべき",
-    ],
-  },
-  {
-    id: "web-media-engine",
-    name: "Web Media Engine（くらべるラボ）",
-    emoji: "🔬",
-    status: "live",
-    statusLabel: "稼働中",
-    progress: 85,
-    revenueModel: "アフィリエイト（会計ソフト/保険/AI/Amazon）",
-    pricing: "会計ソフト¥12,000/件、自動車保険¥3,000/件、AIツール¥2,500/件、Amazon紹介料2-8%",
-    pricingFunnel: "Google検索 → 収益記事(比較表+CTA) → アフィリリンク → 成果報酬",
-    retention: "SEOで継続流入。毎日自動記事生成。週次/月次で改善サイクル",
-    monthlyTarget: 70500,
-    currentMonthly: 0,
-    revenue: {
-      bad: 2000,
-      normal: 25000,
-      good: 70000,
-      badNote: "SEOが弱く月間PV3,000以下。アフィリ成果が月1〜2件のみ",
-      normalNote: "月間PV15,000、会計ソフト月1件(¥12,000)+AIツール月3件+Amazon月15件",
-      goodNote: "月間PV40,000、会計ソフト月2件+保険3件+AIツール6件+Amazon30件",
-    },
     competitors: [
-      { name: "WEEL", users: "法人メディア", pricing: "コンサル誘導" },
-      { name: "AIsmiley", users: "500製品掲載", pricing: "資料請求リード" },
-      { name: "マイベスト", users: "数万記事", pricing: "ASPアフィリエイト" },
-      { name: "SHIFT AI TIMES", users: "フォロワー10万", pricing: "コミュニティ販売" },
+      { name: "note平均的クリエイター", users: "大多数", pricing: "月0〜5,000円" },
+      { name: "note中堅層（継続発信）", users: "数万人", pricing: "月1万〜5万円" },
+      { name: "noteトップ1000", users: "1,000人", pricing: "平均月126万円" },
     ],
-    weakPoints: [
-      "Search Console未登録 → SEOデータ取れない",
-      "Cloudflare Web Analytics未設定 → PVデータ取れない",
-      "ASP案件の提携申請が未完了 → アフィリリンク貼れない",
-      "X(Twitter)アカウント未開設 → SNS流入ゼロ",
-    ],
-    todos: [
-      { task: "Search Console登録 + サイト認証", owner: "manual", priority: "critical" },
-      { task: "Cloudflare Web Analyticsトークン設定", owner: "manual", priority: "critical" },
-      { task: "A8.netでfreee/会計ソフト案件を提携申請", owner: "manual", priority: "critical" },
-      { task: "もしもでAIツール系案件を提携申請", owner: "manual", priority: "critical" },
-      { task: "X(Twitter)アカウント開設・運用開始", owner: "manual", priority: "high" },
-      { task: "記事の自動生成（毎日3本: JST 9:15/15:15/20:15）", owner: "auto", priority: "high" },
-      { task: "daily-audit: 記事監査・改善候補抽出（毎日JST 6:00）", owner: "auto", priority: "high" },
-      { task: "weekly-report: 週次KPIレポート（毎週月曜JST 7:00）", owner: "auto", priority: "high" },
-      { task: "monthly-report: 月次分析（毎月1日JST 7:00）", owner: "auto", priority: "medium" },
-      { task: "サイトUI作り込み（競合並みの品質に）", owner: "auto", priority: "medium" },
-    ],
-    metrics: [
-      { label: "公開記事数", value: "10本", trend: "up" },
-      { label: "ドメイン", value: "kuraberu-lab.com ✓", trend: "up" },
-      { label: "ASP登録", value: "A8 ✓ / もしも ✓", trend: "up" },
-      { label: "Cloudflare Pages", value: "デプロイ済み ✓", trend: "up" },
-      { label: "GitHub Actions", value: "8ワークフロー設定済み", trend: "up" },
-      { label: "テーマ数", value: "9テーマ（AI7+会計+保険）", trend: "up" },
-      { label: "案件数", value: "9件登録", trend: "up" },
-      { label: "今月売上", value: "¥0", trend: "flat" },
-    ],
-    aiSuggestions: [
-      "Search Console未登録が最大のボトルネック。KPIが取れず改善サイクルが回らない",
-      "X運用を開始すべき。競合はSEO+SNSの2本柱。SEOだけでは8か月で月5万は厳しい",
-      "ASP案件の提携申請を急ぐ。記事はあるのにアフィリリンクが貼れない状態",
-      "競合WEELは自社誘導型、マイベストはASP型。くらべるラボは「個人向け中立比較」で差別化可能",
-      "会計ソフト(freee)は単価¥12,000。月1件でもAIツール5件分。確定申告シーズン前に記事準備を",
-    ],
+    currentMonthly: 0,
+    monthlyTarget: 50000,
+    revenue: {
+      bad: 3000,
+      normal: 15000,
+      good: 50000,
+      badNote: "記事は溜まるがフォロワーが伸びず、有料記事が月10本しか売れない",
+      normalNote: "フォロワー300人、有料記事月50本(CVR1%)、マガジン月5本。はてなアフィリ月2000円",
+      goodNote: "フォロワー800人、有料記事月137本、マガジン月12本。はてなアフィリ月5000円",
+    },
+    revenueModel: "有料記事 + マガジン + アフィリエイト",
   },
+
+  // ─── 駐車料金リーダー ───
   {
     id: "parking-reader",
     name: "駐車料金リーダー",
     emoji: "🅿️",
     status: "review",
     statusLabel: "ストア審査待ち",
-    progress: 90,
-    revenueModel: "サブスクリプション（3段階）",
-    pricing: "無料 / 1日パス¥160 / 月額¥350",
-    pricingFunnel: "App Store → 無料DL → 使って価値実感 → 1日パス → 月額へ",
-    retention: "駐車のたびに使う日常ツール",
-    monthlyTarget: 20000,
-    currentMonthly: 0,
-    revenue: {
-      bad: 1000,
-      normal: 8000,
-      good: 30000,
-      badNote: "PPPark(300万DL,4.5★)が市場を支配。差別化できず月100DL以下",
-      normalNote: "AI料金解析という独自機能で月500DL、課金率5%で25人×¥350",
-      goodNote: "SNSやブログで話題になり月2000DL、課金率5%で100人×¥350。PPParkにない「看板撮影→即計算」が刺さる",
-    },
-    competitors: [
-      { name: "PPPark!", users: "累計300万DL", pricing: "無料（広告）" },
-      { name: "akippa", users: "会員450万人", pricing: "無料（予約手数料）" },
-      { name: "タイムズ検索", users: "業界1位", pricing: "無料" },
+    phase: "Phase 4: ストア公開",
+    kpis: [
+      { label: "開発進捗", target: 100, actual: 90, unit: "%", period: "累計" },
+      { label: "App Store申請", target: 1, actual: 0, unit: "件", period: "累計" },
     ],
-    weakPoints: [
-      "Apple Developer承認がブロッカー（3/16申請）",
-      "PPParkが圧倒的（300万DL、★4.5、レビュー46,000件）",
-      "Gemini API無料枠の上限（ユーザー増加時のコスト）",
+    milestones: [
+      { label: "Phase 1-3 実装完了", deadline: "2026-03-15", status: "done" },
+      { label: "Apple Developer申請", deadline: "2026-03-16", status: "done" },
+      { label: "Apple Developer承認", deadline: "2026-03-23", status: "in_progress", note: "3/16申請済み" },
+      { label: "EAS Build → TestFlight", deadline: "2026-03-25", status: "upcoming" },
+      { label: "App Store申請", deadline: "2026-03-28", status: "upcoming" },
+      { label: "Google Play同時申請", deadline: "2026-03-28", status: "upcoming" },
+    ],
+    health: [
+      { name: "RevenueCat", status: "healthy", note: "課金実装済み" },
+      { name: "Gemini API", status: "healthy", note: "料金解析用" },
+    ],
+    blockers: [
+      { issue: "Apple Developer承認待ち", impact: "ストア公開不可", impactAmount: "公開が1日遅れるごとに機会損失", action: "Apple側の処理を待つ（3/16申請済み）", owner: "manual", estimatedMinutes: 0 },
     ],
     todos: [
       { task: "Apple Developer承認を待つ", owner: "manual", priority: "critical", blocked: "Apple側の処理待ち" },
@@ -195,90 +272,90 @@ export const PROJECTS: ProjectData[] = [
       { task: "Google Play同時申請", owner: "manual", priority: "high", blocked: "EAS Build" },
       { task: "ランディングページ/スクリーンショット準備", owner: "manual", priority: "medium" },
     ],
-    metrics: [
-      { label: "開発進捗", value: "Phase 1-3 完了", trend: "up" },
-      { label: "Apple Developer", value: "申請中（3/16〜）", trend: "flat" },
-      { label: "課金実装", value: "RevenueCat済み", trend: "up" },
+    revenueRoadmap: [
+      { month: "2026-04", target: 0, actual: 0, breakdown: [{ source: "公開準備期", target: 0, actual: 0 }] },
+      { month: "2026-05", target: 3000, actual: 0, breakdown: [{ source: "サブスク", target: 3000, actual: 0 }] },
+      { month: "2026-06", target: 5000, actual: 0, breakdown: [{ source: "サブスク", target: 5000, actual: 0 }] },
     ],
-    aiSuggestions: [
-      "PPParkは広告モデル。サブスクで差別化できるが、無料のPPParkとの競争は厳しい",
-      "Apple承認待ちの間にスクリーンショットとASO(App Store Optimization)を準備すべき",
-      "ユーザー増加時のGemini APIコスト：月額課金ユーザーにはPro版APIを検討",
+    competitors: [
+      { name: "PPPark!", users: "累計300万DL", pricing: "無料（広告）" },
+      { name: "akippa", users: "会員450万人", pricing: "無料（予約手数料）" },
+      { name: "タイムズ検索", users: "業界1位", pricing: "無料" },
     ],
+    currentMonthly: 0,
+    monthlyTarget: 20000,
+    revenue: {
+      bad: 1000, normal: 8000, good: 30000,
+      badNote: "PPPark(300万DL,4.5★)が市場を支配。差別化できず月100DL以下",
+      normalNote: "AI料金解析という独自機能で月500DL、課金率5%で25人×¥350",
+      goodNote: "SNSやブログで話題になり月2000DL、課金率5%で100人×¥350",
+    },
+    revenueModel: "サブスクリプション（3段階）",
   },
+
+  // ─── しめどき ───
   {
     id: "shimedoki",
     name: "しめどき",
     emoji: "⏰",
     status: "dev",
     statusLabel: "MVP完了",
-    progress: 80,
-    revenueModel: "Free / Plus（月額/年額）",
-    pricing: "無料（3テンプレ/7日履歴） / Plus",
-    pricingFunnel: "App Store → 無料DL → 会議で便利 → Plus購入",
-    retention: "毎回の会議で使用",
-    monthlyTarget: 5000,
-    currentMonthly: 0,
-    revenue: {
-      bad: 0,
-      normal: 3000,
-      good: 10000,
-      badNote: "市場が小さすぎてDL数が月50以下。Apple Watch対応アプリの収益化は困難と広く認識",
-      normalNote: "ニッチだが競合なし。月200DL、課金率3%で6人×¥500",
-      goodNote: "ビジネスパーソンに刺さり月500DL、課金率5%。Apple Watchアプリは競合少なくファーストムーバー優位",
-    },
-    competitors: [
-      { name: "Meeting Timer: Cost Tracking", users: "少数", pricing: "無料/有料" },
-      { name: "Time Timer", users: "ブランド力あり", pricing: "$2.99〜" },
-      { name: "Apple純正タイマー", users: "全ユーザー", pricing: "無料" },
+    phase: "Phase 3: テスト・申請",
+    kpis: [
+      { label: "開発進捗", target: 100, actual: 80, unit: "%", period: "累計" },
     ],
-    weakPoints: [
-      "Xcodeが未インストール → テスト不可",
-      "Apple Watch市場が小さい",
+    milestones: [
+      { label: "MVP実装", deadline: "2026-03-14", status: "done" },
+      { label: "Xcodeインストール", deadline: "2026-03-25", status: "upcoming" },
+      { label: "実機テスト", deadline: "2026-03-28", status: "upcoming" },
+      { label: "App Store申請", deadline: "2026-04-01", status: "upcoming" },
+    ],
+    health: [],
+    blockers: [
+      { issue: "Xcodeが未インストール", impact: "テスト不可", action: "Xcodeをインストール", owner: "manual", estimatedMinutes: 30 },
     ],
     todos: [
       { task: "Xcodeをインストール", owner: "manual", priority: "critical" },
       { task: "iPhone + Apple Watchで実機テスト", owner: "manual", priority: "high", blocked: "Xcode" },
       { task: "App Store申請", owner: "manual", priority: "high", blocked: "実機テスト" },
     ],
-    metrics: [
-      { label: "開発進捗", value: "MVP実装済み", trend: "up" },
-      { label: "テスト", value: "未テスト", trend: "flat" },
+    revenueRoadmap: [],
+    competitors: [
+      { name: "Meeting Timer: Cost Tracking", users: "少数", pricing: "無料/有料" },
+      { name: "Time Timer", users: "ブランド力あり", pricing: "$2.99〜" },
+      { name: "Apple純正タイマー", users: "全ユーザー", pricing: "無料" },
     ],
-    aiSuggestions: [
-      "Apple Watchアプリは競合が極めて少ない。ニッチだがファーストムーバー優位がある",
-      "駐車料金リーダーと同時にApp Store申請すれば効率的",
-    ],
+    currentMonthly: 0,
+    monthlyTarget: 5000,
+    revenue: {
+      bad: 0, normal: 3000, good: 10000,
+      badNote: "市場が小さすぎてDL数が月50以下",
+      normalNote: "ニッチだが競合なし。月200DL、課金率3%で6人×¥500",
+      goodNote: "ビジネスパーソンに刺さり月500DL、課金率5%",
+    },
+    revenueModel: "Free / Plus（月額/年額）",
   },
+
+  // ─── DoneLog ───
   {
     id: "done-log",
     name: "DoneLog",
     emoji: "✅",
     status: "dev",
     statusLabel: "MVP完了",
-    progress: 75,
-    revenueModel: "Free / Plus",
-    pricing: "無料（8ボタン/14日履歴） / Plus（無制限）",
-    pricingFunnel: "App Store → 無料DL → 毎日使う → 上限に達する → Plus",
-    retention: "データが溜まるほど解約しにくい",
-    monthlyTarget: 5000,
-    currentMonthly: 0,
-    revenue: {
-      bad: 0,
-      normal: 5000,
-      good: 30000,
-      badNote: "Streaks(★4.8)やマイルーティン(300万DL)等の強豪と差別化できず埋もれる",
-      normalNote: "ワンタップの簡便さが刺さり月300DL、課金率3%。月10人×¥500",
-      goodNote: "習慣トラッカー市場は年14%成長(2025年132億ドル)。日本市場特化で月1000DL、課金率5%。マイルーティンは個人開発で300万DL達成の前例あり",
-    },
-    competitors: [
-      { name: "マイルーティン", users: "累計300万DL", pricing: "無料+サブスク" },
-      { name: "Streaks", users: "Apple Design Award", pricing: "$4.99買い切り" },
-      { name: "Habitify", users: "レビュー15万件", pricing: "$29.99/年" },
+    phase: "Phase 3: テスト・申請",
+    kpis: [
+      { label: "開発進捗", target: 100, actual: 75, unit: "%", period: "累計" },
     ],
-    weakPoints: [
-      "Xcodeが未インストール → テスト不可",
-      "マイルーティン(300万DL)という強力な競合",
+    milestones: [
+      { label: "Phase 3 実装完了", deadline: "2026-03-14", status: "done" },
+      { label: "Xcodeインストール", deadline: "2026-03-25", status: "upcoming" },
+      { label: "実機テスト", deadline: "2026-03-28", status: "upcoming" },
+      { label: "App Store申請", deadline: "2026-04-01", status: "upcoming" },
+    ],
+    health: [],
+    blockers: [
+      { issue: "Xcodeが未インストール", impact: "テスト不可", action: "Xcodeをインストール", owner: "manual", estimatedMinutes: 30 },
     ],
     todos: [
       { task: "Xcodeをインストール", owner: "manual", priority: "critical" },
@@ -286,142 +363,141 @@ export const PROJECTS: ProjectData[] = [
       { task: "App Store申請", owner: "manual", priority: "high", blocked: "実機テスト" },
       { task: "マイルーティンとの差別化ポイントを明確にする", owner: "manual", priority: "medium" },
     ],
-    metrics: [
-      { label: "開発進捗", value: "Phase 3完了", trend: "up" },
+    revenueRoadmap: [],
+    competitors: [
+      { name: "マイルーティン", users: "累計300万DL", pricing: "無料+サブスク" },
+      { name: "Streaks", users: "Apple Design Award", pricing: "$4.99買い切り" },
+      { name: "Habitify", users: "レビュー15万件", pricing: "$29.99/年" },
     ],
-    aiSuggestions: [
-      "習慣トラッカー市場は年14%成長。ただしマイルーティンが強い",
-      "差別化: 「ワンタップで完了」「習慣ではなく行動記録」という切り口",
-    ],
+    currentMonthly: 0,
+    monthlyTarget: 5000,
+    revenue: {
+      bad: 0, normal: 5000, good: 30000,
+      badNote: "Streaks(★4.8)やマイルーティン(300万DL)等の強豪と差別化できず",
+      normalNote: "ワンタップの簡便さが刺さり月300DL、課金率3%",
+      goodNote: "習慣トラッカー市場は年14%成長。日本市場特化で月1000DL",
+    },
+    revenueModel: "Free / Plus",
   },
+
+  // ─── ローカルファイル変換 ───
   {
     id: "file-converter",
     name: "ローカルファイル変換",
     emoji: "🔄",
     status: "dev",
     statusLabel: "MVP完了・未デプロイ",
-    progress: 70,
-    revenueModel: "広告（将来）",
-    pricing: "無料（広告あり）",
-    pricingFunnel: "Google検索「HEIC 変換」→ ツール使用 → 広告",
-    retention: "必要な時だけ使うツール",
-    monthlyTarget: 3000,
-    currentMonthly: 0,
-    revenue: {
-      bad: 0,
-      normal: 2000,
-      good: 10000,
-      badNote: "iLoveIMG等の大手に埋もれてPV伸びず",
-      normalNote: "「サーバー送信なし」でニッチ層を獲得。月5000PV、広告月2000円",
-      goodNote: "ファイル変換ツールで月$4,000MRRの成功例あり。ニッチ特化すれば可能性あり",
-    },
-    competitors: [
-      { name: "iLoveIMG", users: "世界最大級", pricing: "無料/Premium$4/月" },
-      { name: "heic2jpg.com", users: "不明", pricing: "無料（広告）" },
-      { name: "CopyTrans HEIC", users: "不明", pricing: "無料" },
+    phase: "Phase 2: デプロイ",
+    kpis: [
+      { label: "開発進捗", target: 100, actual: 70, unit: "%", period: "累計" },
     ],
-    weakPoints: [
-      "Vercelに未デプロイ（コマンド1つで完了するのに放置）",
-      "収益モデルが弱い",
+    milestones: [
+      { label: "MVP実装", deadline: "2026-03-10", status: "done" },
+      { label: "Vercelデプロイ", deadline: "2026-03-22", status: "upcoming" },
+    ],
+    health: [],
+    blockers: [
+      { issue: "Vercel未デプロイ", impact: "ユーザーがアクセスできない", action: "Vercelデプロイ（5分）", owner: "manual", estimatedMinutes: 5 },
     ],
     todos: [
       { task: "Vercelデプロイ（5分）", owner: "manual", priority: "high" },
       { task: "動画変換(ffmpeg.wasm)追加", owner: "auto", priority: "medium" },
       { task: "PWA対応", owner: "auto", priority: "low" },
     ],
-    metrics: [
-      { label: "デプロイ", value: "未デプロイ", trend: "flat" },
+    revenueRoadmap: [],
+    competitors: [
+      { name: "iLoveIMG", users: "世界最大級", pricing: "無料/Premium$4/月" },
+      { name: "heic2jpg.com", users: "不明", pricing: "無料（広告）" },
+      { name: "CopyTrans HEIC", users: "不明", pricing: "無料" },
     ],
-    aiSuggestions: [
-      "デプロイだけなら5分。放置するメリットがない",
-      "「ローカル処理でプライバシー安全」は日本市場で訴求力あり",
-    ],
+    currentMonthly: 0,
+    monthlyTarget: 3000,
+    revenue: {
+      bad: 0, normal: 2000, good: 10000,
+      badNote: "iLoveIMG等の大手に埋もれてPV伸びず",
+      normalNote: "「サーバー送信なし」でニッチ層を獲得。月5000PV",
+      goodNote: "ファイル変換ツールで月$4,000MRRの成功例あり",
+    },
+    revenueModel: "広告（将来）",
   },
+
+  // ─── 車の維持費シミュレーター ───
   {
     id: "car-cost-sim",
     name: "車の維持費シミュレーター",
     emoji: "🧮",
     status: "planned",
     statusLabel: "計画中",
-    progress: 5,
-    revenueModel: "アフィリエイト（保険/ローン）",
-    pricing: "無料ツール → 結果画面でアフィリ誘導",
-    pricingFunnel: "Google検索「車 維持費 計算」→ ツール → 保険見積りリンク",
-    retention: "SEOで継続流入",
-    monthlyTarget: 20000,
-    currentMonthly: 0,
-    revenue: {
-      bad: 0,
-      normal: 10000,
-      good: 30000,
-      badNote: "大手中古車サイト（ガリバー等）がSEO上位を独占。個人サイトが勝てない",
-      normalNote: "ロングテールKWで月1万PV。保険見積り月3件(¥3,000×3)+広告",
-      goodNote: "car-life.adg7.com(62,000車種DB)のような特化サイトの成功例あり。自動車保険+ローンアフィリで月3万円。web-media-engineと連携で相乗効果",
-    },
-    competitors: [
-      { name: "自動車ランニングコスト", users: "62,000車種DB", pricing: "無料（広告）" },
-      { name: "高精度計算サイト(CASIO)", users: "大手", pricing: "無料" },
-      { name: "ガリバー/楽天Car等の大手", users: "SEO上位独占", pricing: "無料記事" },
+    phase: "Phase 0: 企画",
+    kpis: [],
+    milestones: [
+      { label: "企画・設計", deadline: "2026-05-01", status: "upcoming" },
+      { label: "web-media-engineとの連携設計", deadline: "2026-05-15", status: "upcoming" },
     ],
-    weakPoints: [
-      "未着手",
-      "大手のSEO支配が強い",
-    ],
+    health: [],
+    blockers: [],
     todos: [
       { task: "web-media-engineとの連携設計", owner: "auto", priority: "medium" },
       { task: "実装（Next.js、クライアントサイド）", owner: "auto", priority: "medium" },
       { task: "自動車保険ASP案件契約", owner: "manual", priority: "high" },
     ],
-    metrics: [],
-    aiSuggestions: [
-      "web-media-engineの自動車保険テーマと連携すれば月1〜3万円の可能性",
-      "Phase 2以降で着手。今はNOTE Writer/web-media-engineに集中",
+    revenueRoadmap: [],
+    competitors: [
+      { name: "自動車ランニングコスト", users: "62,000車種DB", pricing: "無料（広告）" },
+      { name: "高精度計算サイト(CASIO)", users: "大手", pricing: "無料" },
+      { name: "ガリバー/楽天Car等の大手", users: "SEO上位独占", pricing: "無料記事" },
     ],
+    currentMonthly: 0,
+    monthlyTarget: 20000,
+    revenue: {
+      bad: 0, normal: 10000, good: 30000,
+      badNote: "大手中古車サイトがSEO上位を独占。個人サイトが勝てない",
+      normalNote: "ロングテールKWで月1万PV。保険見積り月3件",
+      goodNote: "自動車保険+ローンアフィリで月3万円。web-media-engineと連携で相乗効果",
+    },
+    revenueModel: "アフィリエイト（保険/ローン）",
   },
+
+  // ─── おうちストック ───
   {
     id: "home-stock",
     name: "おうちストック",
     emoji: "🏠",
     status: "dev",
     statusLabel: "開発中",
-    progress: 20,
-    revenueModel: "Free / Paid",
-    pricing: "無料（1モード/制限あり） / 有料（全機能）",
-    pricingFunnel: "App Store → 無料DL → アイテム増える → 上限 → 有料",
-    retention: "日用品の買い物サイクルに組み込まれる",
-    monthlyTarget: 3000,
-    currentMonthly: 0,
-    revenue: {
-      bad: 0,
-      normal: 2000,
-      good: 8000,
-      badNote: "zaico(18万社)やうちメモが既にある。無料アプリが多く課金率が低い",
-      normalNote: "「交換時期通知」で差別化。月200DL、課金率2%で4人×¥500",
-      goodNote: "消耗品管理のニッチで月500DL。買い物リスト自動生成が刺さる",
-    },
+    phase: "Phase 1: MVP実装",
+    kpis: [
+      { label: "開発進捗", target: 100, actual: 20, unit: "%", period: "累計" },
+    ],
+    milestones: [
+      { label: "テンプレート作成", deadline: "2026-03-10", status: "done" },
+      { label: "MVP機能実装", deadline: "2026-05-01", status: "upcoming" },
+    ],
+    health: [],
+    blockers: [],
+    todos: [
+      { task: "MVP機能実装（アイテム登録/通知/一覧）", owner: "auto", priority: "low" },
+    ],
+    revenueRoadmap: [],
     competitors: [
       { name: "zaico", users: "18万社", pricing: "無料(200件)/有料" },
       { name: "うちメモ", users: "不明", pricing: "無料" },
       { name: "monoca", users: "不明", pricing: "無料/プレミアム" },
     ],
-    weakPoints: [
-      "テンプレートだけでMVP機能が未実装",
-      "類似アプリが多い",
-    ],
-    todos: [
-      { task: "MVP機能実装（アイテム登録/通知/一覧）", owner: "auto", priority: "low" },
-    ],
-    metrics: [
-      { label: "開発進捗", value: "テンプレのみ", trend: "flat" },
-    ],
-    aiSuggestions: [
-      "優先度を下げて収益直結プロジェクトに集中すべき",
-    ],
+    currentMonthly: 0,
+    monthlyTarget: 3000,
+    revenue: {
+      bad: 0, normal: 2000, good: 8000,
+      badNote: "zaico(18万社)やうちメモが既にある。無料アプリが多く課金率が低い",
+      normalNote: "「交換時期通知」で差別化。月200DL、課金率2%",
+      goodNote: "消耗品管理のニッチで月500DL",
+    },
+    revenueModel: "Free / Paid",
   },
 ];
 
 // ============================================================
-// 収入シミュレーション集計
+// 集計ヘルパー
 // ============================================================
 
 export function getRevenueSimulation() {
@@ -435,13 +511,20 @@ export function getRevenueSimulation() {
   return { items, totals };
 }
 
-export function getOwnerTodos(): (TodoItem & { project: string; emoji: string })[] {
+export function getAllBlockers(): (Blocker & { project: string; emoji: string })[] {
   return PROJECTS.flatMap((p) =>
-    p.todos
-      .filter((t) => t.owner === "manual")
-      .map((t) => ({ ...t, project: p.name, emoji: p.emoji }))
-  ).sort((a, b) => {
-    const order = { critical: 0, high: 1, medium: 2, low: 3 };
-    return order[a.priority] - order[b.priority];
-  });
+    p.blockers.map((b) => ({ ...b, project: p.name, emoji: p.emoji }))
+  );
+}
+
+export function getAllMilestones(): (Milestone & { project: string; emoji: string })[] {
+  return PROJECTS.flatMap((p) =>
+    p.milestones.map((m) => ({ ...m, project: p.name, emoji: p.emoji }))
+  ).sort((a, b) => a.deadline.localeCompare(b.deadline));
+}
+
+export function getAllHealth(): (SystemHealth & { project: string; emoji: string })[] {
+  return PROJECTS.flatMap((p) =>
+    p.health.map((h) => ({ ...h, project: p.name, emoji: p.emoji }))
+  );
 }

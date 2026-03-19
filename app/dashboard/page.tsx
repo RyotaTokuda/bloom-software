@@ -2,43 +2,215 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { PROJECTS, getRevenueSimulation, getOwnerTodos, type ProjectData, type TodoItem } from "./data";
+import {
+  PROJECTS,
+  getRevenueSimulation,
+  getAllBlockers,
+  getAllMilestones,
+  getAllHealth,
+  type ProjectData,
+  type KPI,
+} from "./data";
 
 const isProduction = process.env.NEXT_PUBLIC_STAGE === "production";
 
-const statusColors = { live: "bg-emerald-500", review: "bg-blue-500", dev: "bg-orange-500", planned: "bg-gray-500" };
-const priorityColors = { critical: "bg-red-500", high: "bg-orange-500", medium: "bg-yellow-500", low: "bg-gray-500" };
-const priorityLabels = { critical: "今すぐ", high: "高", medium: "中", low: "低" };
-const trendIcons = { up: "↑", down: "↓", flat: "→" };
-const trendColors = { up: "text-emerald-400", down: "text-red-400", flat: "text-gray-500" };
+type View = "overview" | "blockers" | "kpi" | "timeline" | "revenue" | "system";
 
-type View = "overview" | "revenue" | "todos" | "simulation" | "suggestions";
+const viewLabels: Record<View, string> = {
+  overview: "概況",
+  blockers: "ブロッカー",
+  kpi: "KPI",
+  timeline: "タイムライン",
+  revenue: "収益",
+  system: "システム",
+};
+
+const statusColors: Record<string, string> = { live: "bg-emerald-500", review: "bg-blue-500", dev: "bg-orange-500", planned: "bg-gray-500" };
+const healthDot: Record<string, string> = { healthy: "bg-emerald-500", warning: "bg-amber-500", error: "bg-red-500", unknown: "bg-gray-500" };
+
+// 競合分析ハードコード
+const competitorAnalysis: Record<string, Record<string, { strengths: string; weaknesses: string }>> = {
+  "web-media-engine": {
+    WEEL: { strengths: "法人向けコンサル導線が強固。専門ライター陣。ドメインパワーが高い", weaknesses: "個人ユーザー向けの比較記事が薄い。SEOロングテールを取りきれていない" },
+    AIsmiley: { strengths: "500以上の製品DB。資料請求のリードジェネレーションが確立", weaknesses: "UIが古い。個別ツールの深掘りレビューが弱い" },
+    マイベスト: { strengths: "圧倒的な記事数とドメインパワー。独自の検証体制", weaknesses: "AIツール特化ではない。更新頻度がカテゴリにより不均一" },
+    "SHIFT AI TIMES": { strengths: "コミュニティ10万人。SNSでの拡散力が圧倒的", weaknesses: "SEOが弱い。検索流入に依存していない分、検索市場は空いている" },
+  },
+  "note-writer": {
+    "note平均的クリエイター": { strengths: "数が多く、あらゆるジャンルをカバー", weaknesses: "継続率が低い。差別化できていない人が大半" },
+    "note中堅層（継続発信）": { strengths: "固定ファンがいる。マガジン運営のノウハウがある", weaknesses: "AI活用が進んでいない。投稿頻度に限界がある" },
+    "noteトップ1000": { strengths: "平均月126万円。ブランド力が確立", weaknesses: "参入障壁が高いように見えるが、ニッチ特化で狙える余地あり" },
+  },
+  "parking-reader": {
+    "PPPark!": { strengths: "累計300万DL、★4.5。駐車場検索の定番アプリ", weaknesses: "料金表のAI解析機能はない。UI/UXが古めかしい" },
+    akippa: { strengths: "450万会員。予約型で安定した収益モデル", weaknesses: "リアルタイムの料金比較ではない。コインパーキングに弱い" },
+    タイムズ検索: { strengths: "業界最大手。自社データベースが豊富", weaknesses: "自社パーキングのみ。他社料金との比較ができない" },
+  },
+  shimedoki: {
+    "Meeting Timer: Cost Tracking": { strengths: "コスト計算という同じコンセプト", weaknesses: "ユーザー数が少ない。Apple Watch対応が弱い" },
+    "Time Timer": { strengths: "ブランド力。教育現場での実績", weaknesses: "会議コスト計算の機能がない。ビジネス用途に特化していない" },
+    "Apple純正タイマー": { strengths: "プリインストール。全ユーザーが使える", weaknesses: "コスト計算機能なし。会議特化の機能がない" },
+  },
+  "done-log": {
+    マイルーティン: { strengths: "300万DL。習慣トラッカーの定番", weaknesses: "ワンタップでの記録に特化していない。UIがやや複雑" },
+    Streaks: { strengths: "Apple Design Award受賞。洗練されたUI", weaknesses: "買い切り$4.99で安いが、日本市場のローカライズが弱い" },
+    Habitify: { strengths: "15万件のレビュー。多機能", weaknesses: "年$29.99は高い。シンプルさを求めるユーザーには過剰" },
+  },
+  "file-converter": {
+    iLoveIMG: { strengths: "世界最大級。あらゆるフォーマットに対応", weaknesses: "サーバーにファイルをアップロードする必要がある。プライバシー懸念" },
+    "heic2jpg.com": { strengths: "HEIC変換に特化。シンプル", weaknesses: "サーバー送信型。対応フォーマットが限定的" },
+    "CopyTrans HEIC": { strengths: "デスクトップアプリで高速", weaknesses: "Windows限定。Webからはアクセスできない" },
+  },
+  "car-cost-sim": {
+    自動車ランニングコスト: { strengths: "62,000車種のDB。網羅性が高い", weaknesses: "UIが古い。モバイル対応が不十分" },
+    "高精度計算サイト(CASIO)": { strengths: "ブランド信頼性。計算精度", weaknesses: "車に特化していない。UXがエンジニア向け" },
+    "ガリバー/楽天Car等の大手": { strengths: "SEO上位を独占。コンテンツ量が圧倒的", weaknesses: "シミュレーターとしての機能は薄い。記事中心" },
+  },
+  "home-stock": {
+    zaico: { strengths: "18万社が利用。法人向けの実績", weaknesses: "個人向けUIではない。無料枠が200件と少ない" },
+    うちメモ: { strengths: "家庭向けに特化。シンプル", weaknesses: "交換時期の通知機能がない。更新が止まっている" },
+    monoca: { strengths: "デザインが良い。カテゴリ分けが柔軟", weaknesses: "消耗品の交換サイクル管理がない" },
+  },
+};
+
+// 上振れ戦略ハードコード
+const upsideStrategies: { project: string; emoji: string; strategies: { name: string; impact: string; timing: string }[] }[] = [
+  {
+    project: "Web Media Engine",
+    emoji: "🔬",
+    strategies: [
+      { name: "特別単価交渉（freee等）", impact: "+¥15,000/月", timing: "2026年7月〜" },
+      { name: "SNS x SEO相乗効果（X運用）", impact: "+¥10,000/月", timing: "2026年5月〜" },
+      { name: "季節テーマ記事（確定申告シーズン）", impact: "+¥20,000/月", timing: "2027年1月〜3月" },
+      { name: "計算ツール連携（車の維持費シミュレーター）", impact: "+¥8,000/月", timing: "2026年6月〜" },
+    ],
+  },
+  {
+    project: "NOTE Writer",
+    emoji: "📝",
+    strategies: [
+      { name: "NOTEマガジン化（月額課金）", impact: "+¥5,000/月", timing: "2026年5月〜" },
+      { name: "シリーズ記事（全10回等）", impact: "+¥3,000/月", timing: "2026年5月〜" },
+      { name: "他クリエイターとのコラボ企画", impact: "+¥8,000/月", timing: "2026年7月〜" },
+      { name: "メルマガ/LINE連携", impact: "+¥10,000/月", timing: "2026年8月〜" },
+    ],
+  },
+];
 
 export default function Dashboard() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [view, setView] = useState<View>("overview");
+  const [resolvedBlockers, setResolvedBlockers] = useState<Set<string>>(new Set());
+  const [expandedBlockers, setExpandedBlockers] = useState<Set<string>>(new Set());
+  const [expandedOverviewBlockers, setExpandedOverviewBlockers] = useState<Set<number>>(new Set());
+  const [selectedKpiProject, setSelectedKpiProject] = useState(0);
+  const [selectedRevenueProject, setSelectedRevenueProject] = useState(0);
+  const [selectedCompetitorProject, setSelectedCompetitorProject] = useState(0);
+  const [expandedCompetitors, setExpandedCompetitors] = useState<Set<string>>(new Set());
+  const [showDoneMilestones, setShowDoneMilestones] = useState(false);
 
-  if (isProduction) return <div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Not found</p></div>;
+  if (isProduction) return <div className="min-h-screen flex items-center justify-center bg-gray-950"><p className="text-gray-400">Not found</p></div>;
 
   const sim = getRevenueSimulation();
-  const ownerTodos = getOwnerTodos();
-  const allSuggestions = PROJECTS.flatMap((p) => p.aiSuggestions.map((s) => ({ project: p.name, emoji: p.emoji, suggestion: s })));
+  const allBlockers = getAllBlockers();
+  const allMilestones = getAllMilestones();
+  const allHealthItems = getAllHealth();
+  const unresolvedBlockers = allBlockers.filter((b) => !resolvedBlockers.has(b.issue));
+  const totalCurrentMonthly = PROJECTS.reduce((s, p) => s + p.currentMonthly, 0);
+  const totalMonthlyTarget = PROJECTS.reduce((s, p) => s + p.monthlyTarget, 0);
+  const healthyCount = allHealthItems.filter((h) => h.status === "healthy").length;
+  const totalArticles = PROJECTS.reduce((s, p) => {
+    const articleKpi = p.kpis.find((k) => k.label.includes("記事数") || k.label.includes("公開記事"));
+    return s + (articleKpi ? articleKpi.actual : 0);
+  }, 0);
+
+  function toggleBlocker(issue: string) {
+    setResolvedBlockers((prev) => {
+      const next = new Set(prev);
+      if (next.has(issue)) next.delete(issue); else next.add(issue);
+      return next;
+    });
+  }
+
+  function toggleExpandBlocker(issue: string) {
+    setExpandedBlockers((prev) => {
+      const next = new Set(prev);
+      if (next.has(issue)) next.delete(issue); else next.add(issue);
+      return next;
+    });
+  }
+
+  function toggleOverviewBlocker(idx: number) {
+    setExpandedOverviewBlockers((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx); else next.add(idx);
+      return next;
+    });
+  }
+
+  function toggleCompetitor(name: string) {
+    setExpandedCompetitors((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name); else next.add(name);
+      return next;
+    });
+  }
+
+  function kpiRate(k: KPI): number {
+    if (k.target === 0) return 0;
+    return Math.round((k.actual / k.target) * 100);
+  }
+
+  function kpiBarColor(rate: number): string {
+    if (rate < 30) return "bg-red-500";
+    if (rate < 60) return "bg-orange-500";
+    if (rate < 80) return "bg-yellow-500";
+    return "bg-emerald-500";
+  }
+
+  function kpiTextColor(rate: number): string {
+    if (rate < 30) return "text-red-400";
+    if (rate < 60) return "text-orange-400";
+    if (rate < 80) return "text-yellow-400";
+    return "text-emerald-400";
+  }
+
+  function projectKpiAvg(p: ProjectData): number {
+    const measurable = p.kpis.filter((k) => k.target > 0);
+    if (measurable.length === 0) return 0;
+    return Math.round(measurable.reduce((s, k) => s + kpiRate(k), 0) / measurable.length);
+  }
+
+  // グループ化: プロジェクト別ブロッカー
+  const blockersByProject = PROJECTS.filter((p) => p.blockers.length > 0).map((p) => ({
+    ...p,
+    projectBlockers: p.blockers.map((b) => ({ ...b, project: p.name, emoji: p.emoji })),
+  }));
+
+  // 収益用プロジェクト（ロードマップあり）
+  const revenueProjects = PROJECTS.filter((p) => p.revenueRoadmap.length > 0);
+
+  // KPIありプロジェクト
+  const kpiProjects = PROJECTS.filter((p) => p.kpis.length > 0);
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-200">
+      {/* Header */}
       <header className="border-b border-gray-800 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-gray-500 hover:text-gray-300 text-sm">&larr; サイト</Link>
             <span className="text-gray-700">|</span>
             <h1 className="text-lg font-bold">Dev Dashboard</h1>
             <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-medium">DEV</span>
           </div>
-          <div className="flex gap-1">
-            {(["overview", "todos", "revenue", "simulation", "suggestions"] as View[]).map((v) => (
+          <div className="flex gap-1 flex-wrap">
+            {(Object.keys(viewLabels) as View[]).map((v) => (
               <button key={v} onClick={() => setView(v)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${view === v ? "bg-gray-700 text-white" : "text-gray-500 hover:text-gray-300"}`}>
-                {{ overview: "全体", todos: "やること", revenue: "収益", simulation: "試算", suggestions: "提案" }[v]}
+                {viewLabels[v]}
+                {v === "blockers" && unresolvedBlockers.length > 0 && (
+                  <span className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">{unresolvedBlockers.length}</span>
+                )}
               </button>
             ))}
           </div>
@@ -46,259 +218,632 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* サマリー */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
-          <Card label="プロジェクト" value={`${PROJECTS.length}`} sub={`稼働中: ${PROJECTS.filter((p) => p.status === "live").length}`} />
-          <Card label="月間目標" value={`¥${sim.totals.normal.toLocaleString()}`} sub="普通シナリオ" />
-          <Card label="現在の月間売上" value={`¥${PROJECTS.reduce((s, p) => s + p.currentMonthly, 0).toLocaleString()}`} sub="全体" />
-          <Card label="あなたのToDo" value={`${ownerTodos.length}件`} sub={`うち緊急: ${ownerTodos.filter((t) => t.priority === "critical").length}件`} />
-          <Card label="AI提案" value={`${allSuggestions.length}件`} sub="" />
-        </div>
 
-        {/* ========== やること ========== */}
-        {view === "todos" && (
-          <div>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">あなたがやること（優先順）</h2>
-            <div className="space-y-2">
-              {ownerTodos.map((t, i) => (
-                <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-start gap-3">
-                  <span className={`shrink-0 text-xs text-white font-bold px-2 py-1 rounded ${priorityColors[t.priority]}`}>
-                    {priorityLabels[t.priority]}
-                  </span>
-                  <div className="flex-1">
-                    <div className="text-sm">{t.task}</div>
-                    <div className="text-xs text-gray-500 mt-0.5">{t.emoji} {t.project}</div>
-                    {t.blocked && <div className="text-xs text-red-400 mt-0.5">ブロッカー: {t.blocked}</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mt-8 mb-4">自動で実行されること</h2>
-            <div className="space-y-2">
-              {PROJECTS.flatMap((p) => p.todos.filter((t) => t.owner === "auto").map((t) => ({ ...t, project: p.name, emoji: p.emoji }))).map((t, i) => (
-                <div key={i} className="bg-gray-900/50 border border-gray-800/50 rounded-xl p-4 flex items-start gap-3 opacity-60">
-                  <span className="shrink-0 text-xs text-gray-400 font-bold px-2 py-1 rounded bg-gray-800">自動</span>
-                  <div>
-                    <div className="text-sm text-gray-400">{t.task}</div>
-                    <div className="text-xs text-gray-600 mt-0.5">{t.emoji} {t.project}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ========== 全体 ========== */}
+        {/* ================================================================
+            1. 概況（Overview）
+            ================================================================ */}
         {view === "overview" && (
-          <div className="space-y-3">
-            {PROJECTS.map((p) => (
-              <div key={p.id} onClick={() => setSelectedId(selectedId === p.id ? null : p.id)}
-                className="bg-gray-900 border border-gray-800 rounded-xl p-5 cursor-pointer hover:border-gray-600 transition-colors">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{p.emoji}</span>
-                    <div>
-                      <h3 className="font-bold text-sm">{p.name}</h3>
-                      <span className={`inline-block text-xs px-2 py-0.5 rounded-full text-white mt-0.5 ${statusColors[p.status]}`}>{p.statusLabel}</span>
-                    </div>
-                  </div>
-                  <div className="text-right text-xs text-gray-500">
-                    普通: ¥{p.revenue.normal.toLocaleString()}/月
-                  </div>
+          <div className="space-y-6">
+            {/* 上段: 4サマリーカード */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                <div className="text-xs text-gray-500 uppercase mb-1">ブロッカー</div>
+                <div className={`text-3xl font-bold ${unresolvedBlockers.length > 0 ? "text-red-400" : "text-emerald-400"}`}>
+                  {unresolvedBlockers.length}
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-gray-800 rounded-full h-2">
-                    <div className={`h-2 rounded-full ${p.progress >= 80 ? "bg-emerald-500" : p.progress >= 50 ? "bg-orange-500" : "bg-gray-500"}`}
-                      style={{ width: `${p.progress}%` }} />
-                  </div>
-                  <span className="text-xs text-gray-500 w-10 text-right">{p.progress}%</span>
+                <div className="text-xs text-gray-600 mt-0.5">{unresolvedBlockers.length > 0 ? "要対応" : "なし"}</div>
+              </div>
+              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                <div className="text-xs text-gray-500 uppercase mb-1">今月売上 / 目標</div>
+                <div className="text-3xl font-bold text-gray-200">¥{totalCurrentMonthly.toLocaleString()}</div>
+                <div className="text-xs text-gray-600 mt-0.5">/ ¥{totalMonthlyTarget.toLocaleString()}</div>
+              </div>
+              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                <div className="text-xs text-gray-500 uppercase mb-1">システム正常率</div>
+                <div className={`text-3xl font-bold ${healthyCount === allHealthItems.length ? "text-emerald-400" : "text-amber-400"}`}>
+                  {allHealthItems.length > 0 ? `${Math.round((healthyCount / allHealthItems.length) * 100)}%` : "—"}
                 </div>
-
-                {selectedId === p.id && <ProjectDetail p={p} />}
+                <div className="text-xs text-gray-600 mt-0.5">{healthyCount}/{allHealthItems.length} 正常</div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* ========== 収益 ========== */}
-        {view === "revenue" && (
-          <div className="space-y-4">
-            {PROJECTS.filter((p) => p.monthlyTarget > 0).sort((a, b) => b.revenue.normal - a.revenue.normal).map((p) => (
-              <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-sm">{p.emoji} {p.name}</span>
-                  <span className="font-bold">¥{p.revenue.normal.toLocaleString()}/月</span>
-                </div>
-                <div className="text-xs text-gray-500 mb-2">{p.revenueModel}</div>
-                {p.pricing && <div className="text-xs text-gray-400 mb-1">設定: {p.pricing}</div>}
-                {p.pricingFunnel && <div className="text-xs text-gray-500 bg-gray-800/50 rounded-lg p-2 mt-2">動線: {p.pricingFunnel}</div>}
-                {p.retention && <div className="text-xs text-gray-500 mt-1">継続: {p.retention}</div>}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ========== 試算 ========== */}
-        {view === "simulation" && (
-          <div>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-              全サービスリリース後の月間収入シミュレーション
-            </h2>
-
-            {/* 合計 */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="bg-red-950/30 border border-red-900/30 rounded-xl p-5 text-center">
-                <div className="text-xs text-red-400 mb-1">だめ</div>
-                <div className="text-2xl font-bold text-red-400">¥{sim.totals.bad.toLocaleString()}</div>
-                <div className="text-xs text-gray-500 mt-1">月間合計</div>
-              </div>
-              <div className="bg-yellow-950/30 border border-yellow-900/30 rounded-xl p-5 text-center">
-                <div className="text-xs text-yellow-400 mb-1">普通</div>
-                <div className="text-2xl font-bold text-yellow-400">¥{sim.totals.normal.toLocaleString()}</div>
-                <div className="text-xs text-gray-500 mt-1">月間合計</div>
-              </div>
-              <div className="bg-emerald-950/30 border border-emerald-900/30 rounded-xl p-5 text-center">
-                <div className="text-xs text-emerald-400 mb-1">良い</div>
-                <div className="text-2xl font-bold text-emerald-400">¥{sim.totals.good.toLocaleString()}</div>
-                <div className="text-xs text-gray-500 mt-1">月間合計</div>
+              <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                <div className="text-xs text-gray-500 uppercase mb-1">公開記事合計</div>
+                <div className="text-3xl font-bold text-gray-200">{totalArticles}本</div>
+                <div className="text-xs text-gray-600 mt-0.5">全プロジェクト</div>
               </div>
             </div>
 
-            {/* 内訳 */}
-            <div className="space-y-3">
-              {PROJECTS.sort((a, b) => b.revenue.normal - a.revenue.normal).map((p) => (
-                <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-bold text-sm">{p.emoji} {p.name}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full text-white ${statusColors[p.status]}`}>{p.statusLabel}</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-3 mb-3">
-                    <div className="text-center">
-                      <div className="text-xs text-red-400">だめ</div>
-                      <div className="font-bold text-red-400">¥{p.revenue.bad.toLocaleString()}</div>
+            {/* 中段: プロジェクト行 */}
+            <div>
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">プロジェクト</h2>
+              <div className="space-y-2">
+                {PROJECTS.map((p) => {
+                  const avg = projectKpiAvg(p);
+                  const hasMeasurable = p.kpis.filter((k) => k.target > 0).length > 0;
+                  const pBlockerCount = p.blockers.filter((b) => !resolvedBlockers.has(b.issue)).length;
+                  return (
+                    <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-xl px-5 py-3 flex items-center gap-4">
+                      <span className="text-xl">{p.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold truncate">{p.name}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full text-white ${statusColors[p.status]}`}>{p.statusLabel}</span>
+                        </div>
+                        <div className="text-xs text-gray-500 truncate">{p.phase}</div>
+                      </div>
+                      {/* KPI達成率バー */}
+                      <div className="w-32 shrink-0">
+                        {hasMeasurable ? (
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 bg-gray-800 rounded-full h-1.5">
+                              <div className={`h-1.5 rounded-full ${kpiBarColor(avg)}`} style={{ width: `${Math.min(avg, 100)}%` }} />
+                            </div>
+                            <span className={`text-xs font-bold w-8 text-right ${kpiTextColor(avg)}`}>{avg}%</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-600">—</span>
+                        )}
+                      </div>
+                      {/* ヘルスドット */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        {p.health.length > 0 ? (
+                          p.health.map((h, i) => (
+                            <div key={i} className={`w-2.5 h-2.5 rounded-full ${healthDot[h.status]}`} />
+                          ))
+                        ) : (
+                          <div className="w-2.5 h-2.5 rounded-full bg-gray-700" />
+                        )}
+                      </div>
+                      {/* ブロッカー件数 */}
+                      <div className="shrink-0 w-12 text-right">
+                        {pBlockerCount > 0 ? (
+                          <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-medium">{pBlockerCount}</span>
+                        ) : (
+                          <span className="text-xs text-gray-600">0</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-xs text-yellow-400">普通</div>
-                      <div className="font-bold text-yellow-400">¥{p.revenue.normal.toLocaleString()}</div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 下段: ブロッカーTOP3 */}
+            {unresolvedBlockers.length > 0 && (
+              <div>
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                  要対応ブロッカー TOP{Math.min(unresolvedBlockers.length, 3)}
+                </h2>
+                <div className="space-y-2">
+                  {unresolvedBlockers.slice(0, 3).map((b, i) => (
+                    <div key={i} className="bg-red-950/20 border border-red-900/30 rounded-xl p-4 cursor-pointer"
+                      onClick={() => toggleOverviewBlocker(i)}>
+                      <div className="flex items-start gap-3">
+                        <span className="text-lg">{b.emoji}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium">{b.issue}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{b.impact}</div>
+                          {b.impactAmount && <div className="text-xs text-red-400 mt-0.5">{b.impactAmount}</div>}
+                        </div>
+                        {b.estimatedMinutes !== undefined && b.estimatedMinutes > 0 && (
+                          <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded shrink-0">{b.estimatedMinutes}分</span>
+                        )}
+                      </div>
+                      {expandedOverviewBlockers.has(i) && (
+                        <div className="mt-3 ml-9 text-xs text-gray-400 bg-gray-800/50 rounded-lg px-3 py-2">
+                          <div className="text-gray-500 mb-1">対応手順:</div>
+                          <div>{b.action}</div>
+                        </div>
+                      )}
                     </div>
-                    <div className="text-center">
-                      <div className="text-xs text-emerald-400">良い</div>
-                      <div className="font-bold text-emerald-400">¥{p.revenue.good.toLocaleString()}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ================================================================
+            2. ブロッカー（Blockers）
+            ================================================================ */}
+        {view === "blockers" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">ブロッカー</h2>
+              <div className="text-xs text-gray-500">
+                {unresolvedBlockers.length}件 未解消 / {allBlockers.length}件 合計
+              </div>
+            </div>
+
+            {blockersByProject.map((p) => (
+              <div key={p.id}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg">{p.emoji}</span>
+                  <h3 className="text-sm font-bold">{p.name}</h3>
+                  <span className="text-xs text-gray-500">({p.projectBlockers.filter((b) => !resolvedBlockers.has(b.issue)).length}件)</span>
+                </div>
+                <div className="space-y-2">
+                  {p.projectBlockers.map((b, i) => {
+                    const resolved = resolvedBlockers.has(b.issue);
+                    const expanded = expandedBlockers.has(b.issue);
+                    return (
+                      <div key={i}
+                        className={`border rounded-xl p-4 ${resolved ? "bg-gray-900/30 border-gray-800/50 opacity-50" : "bg-gray-900 border-gray-800"}`}>
+                        <div className="flex items-start gap-3">
+                          {/* チェックボックス */}
+                          <button onClick={() => toggleBlocker(b.issue)}
+                            className={`shrink-0 mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${resolved ? "bg-emerald-500 border-emerald-500" : "border-gray-600 hover:border-gray-400"}`}>
+                            {resolved && <span className="text-white text-xs">&#10003;</span>}
+                          </button>
+                          {/* 赤!アイコン */}
+                          <div className="shrink-0 w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center">
+                            <span className="text-red-400 text-xs font-bold">!</span>
+                          </div>
+                          {/* 中央 */}
+                          <div className="flex-1 min-w-0 cursor-pointer" onClick={() => toggleExpandBlocker(b.issue)}>
+                            <div className={`text-sm font-bold ${resolved ? "line-through text-gray-500" : ""}`}>{b.issue}</div>
+                            <div className="text-xs text-gray-400 mt-0.5">{b.impact}</div>
+                            {b.impactAmount && <div className="text-xs text-red-400 mt-0.5">{b.impactAmount}</div>}
+                          </div>
+                          {/* 右 */}
+                          <div className="shrink-0 text-right space-y-1">
+                            {b.estimatedMinutes !== undefined && b.estimatedMinutes > 0 && (
+                              <span className="text-xs bg-gray-800 text-gray-300 px-2 py-0.5 rounded">{b.estimatedMinutes}分</span>
+                            )}
+                            <div>
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded ${b.owner === "manual" ? "bg-blue-500/20 text-blue-400" : "bg-gray-700 text-gray-400"}`}>
+                                {b.owner === "manual" ? "手動" : "自動"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {/* アクション概要（常時表示） */}
+                        <div className="mt-2 ml-14 text-xs text-gray-400">
+                          <span className="text-gray-500">次:</span> {b.action}
+                        </div>
+                        {/* 展開: 詳細ステップ */}
+                        {expanded && (
+                          <div className="mt-3 ml-14 bg-gray-800/50 rounded-lg px-3 py-2">
+                            <div className="text-xs text-gray-500 mb-1">詳細手順:</div>
+                            <ol className="text-xs text-gray-400 space-y-1 list-decimal list-inside">
+                              {b.action.split(/[、。]/).filter(Boolean).map((step, si) => (
+                                <li key={si}>{step.trim()}</li>
+                              ))}
+                            </ol>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {allBlockers.length === 0 && (
+              <div className="text-center text-gray-500 py-12 text-sm">ブロッカーなし</div>
+            )}
+          </div>
+        )}
+
+        {/* ================================================================
+            3. KPI
+            ================================================================ */}
+        {view === "kpi" && (
+          <div className="space-y-6">
+            {/* プロジェクト選択ピル */}
+            <div className="flex gap-1 flex-wrap">
+              {kpiProjects.map((p, i) => (
+                <button key={p.id} onClick={() => setSelectedKpiProject(i)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedKpiProject === i ? "bg-gray-700 text-white" : "text-gray-500 hover:text-gray-300"}`}>
+                  {p.emoji} {p.name}
+                </button>
+              ))}
+            </div>
+
+            {/* 選択プロジェクトのKPI */}
+            {kpiProjects[selectedKpiProject] && (
+              <div className="space-y-3">
+                {kpiProjects[selectedKpiProject].kpis.map((k, i) => {
+                  const rate = kpiRate(k);
+                  const pct = Math.min(rate, 100);
+                  const isNoTarget = k.target === 0;
+                  return (
+                    <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-gray-200">{k.label}</span>
+                          <span className="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded">{k.period}</span>
+                        </div>
+                        {!isNoTarget && (
+                          <span className={`text-sm font-bold ${kpiTextColor(rate)}`}>{rate}%</span>
+                        )}
+                      </div>
+                      <div className="text-2xl font-bold text-gray-200">
+                        {k.actual.toLocaleString()}
+                        <span className="text-gray-500 text-lg"> / {k.target.toLocaleString()}{k.unit}</span>
+                      </div>
+                      {isNoTarget ? (
+                        <div className="mt-2">
+                          <div className="text-xs text-gray-500 mb-1">目標未設定</div>
+                          <div className="w-full bg-gray-800 rounded-full h-1.5">
+                            <div className="h-1.5 rounded-full bg-gray-600" style={{ width: "0%" }} />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-2">
+                          <div className="w-full bg-gray-800 rounded-full h-1.5">
+                            <div className={`h-1.5 rounded-full ${kpiBarColor(rate)}`} style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      )}
                     </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* ミニ棒グラフ: 全プロジェクトKPI達成率比較 */}
+            <div>
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">プロジェクト別 KPI達成率</h2>
+              <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-3">
+                {PROJECTS.filter((p) => p.kpis.some((k) => k.target > 0)).map((p) => {
+                  const avg = projectKpiAvg(p);
+                  return (
+                    <div key={p.id} className="flex items-center gap-2">
+                      <span className="text-xs w-24 truncate">{p.emoji} {p.name}</span>
+                      <div className="flex-1 bg-gray-800 rounded-full h-2">
+                        <div className={`h-2 rounded-full ${kpiBarColor(avg)}`} style={{ width: `${Math.min(avg, 100)}%` }} />
+                      </div>
+                      <span className={`text-xs w-10 text-right font-bold ${kpiTextColor(avg)}`}>{avg}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================================================================
+            4. タイムライン
+            ================================================================ */}
+        {view === "timeline" && (
+          <div className="space-y-6">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">タイムライン</h2>
+
+            {/* 遅延 */}
+            {(() => {
+              const items = allMilestones.filter((m) => m.status === "overdue");
+              if (items.length === 0) return null;
+              return (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span>🔴</span>
+                    <h3 className="text-xs font-semibold text-red-400 uppercase">遅延（{items.length}）</h3>
                   </div>
-                  <div className="space-y-1 text-xs">
-                    <div className="text-red-300/60"><span className="text-red-400">だめ:</span> {p.revenue.badNote}</div>
-                    <div className="text-yellow-300/60"><span className="text-yellow-400">普通:</span> {p.revenue.normalNote}</div>
-                    <div className="text-emerald-300/60"><span className="text-emerald-400">良い:</span> {p.revenue.goodNote}</div>
+                  <div className="space-y-1.5">
+                    {items.map((m, i) => (
+                      <div key={i} className="bg-red-950/20 border border-red-900/30 rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs">
+                        <span>{m.emoji}</span>
+                        <span className="text-gray-400 w-20 shrink-0">{m.deadline}</span>
+                        <span className="text-gray-300 flex-1">{m.label}</span>
+                        <span className="text-gray-600 shrink-0">{m.project}</span>
+                        {m.note && <span className="text-gray-600 truncate max-w-48">{m.note}</span>}
+                      </div>
+                    ))}
                   </div>
-                  {/* 競合 */}
-                  {p.competitors.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-800">
-                      <div className="text-xs text-gray-500 mb-1">競合:</div>
-                      {p.competitors.map((c, i) => (
-                        <div key={i} className="text-xs text-gray-500">{c.name} — {c.users} — {c.pricing}</div>
+                </div>
+              );
+            })()}
+
+            {/* 進行中 */}
+            {(() => {
+              const items = allMilestones.filter((m) => m.status === "in_progress");
+              if (items.length === 0) return null;
+              return (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span>🟡</span>
+                    <h3 className="text-xs font-semibold text-yellow-400 uppercase">進行中（{items.length}）</h3>
+                  </div>
+                  <div className="space-y-1.5">
+                    {items.map((m, i) => (
+                      <div key={i} className="bg-yellow-950/20 border border-yellow-900/30 rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs">
+                        <span>{m.emoji}</span>
+                        <span className="text-gray-400 w-20 shrink-0">{m.deadline}</span>
+                        <span className="text-gray-300 flex-1">{m.label}</span>
+                        <span className="text-gray-600 shrink-0">{m.project}</span>
+                        {m.note && <span className="text-gray-600 truncate max-w-48">{m.note}</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* 予定 */}
+            {(() => {
+              const items = allMilestones.filter((m) => m.status === "upcoming");
+              if (items.length === 0) return null;
+              return (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span>⚪</span>
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase">予定（{items.length}）</h3>
+                  </div>
+                  <div className="space-y-1.5">
+                    {items.map((m, i) => (
+                      <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs">
+                        <span>{m.emoji}</span>
+                        <span className="text-gray-400 w-20 shrink-0">{m.deadline}</span>
+                        <span className="text-gray-300 flex-1">{m.label}</span>
+                        <span className="text-gray-600 shrink-0">{m.project}</span>
+                        {m.note && <span className="text-gray-600 truncate max-w-48">{m.note}</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* 完了（折りたたみ） */}
+            {(() => {
+              const items = allMilestones.filter((m) => m.status === "done");
+              if (items.length === 0) return null;
+              return (
+                <div>
+                  <button onClick={() => setShowDoneMilestones(!showDoneMilestones)}
+                    className="flex items-center gap-2 mb-2">
+                    <span>✅</span>
+                    <h3 className="text-xs font-semibold text-emerald-400 uppercase">完了（{items.length}）</h3>
+                    <span className="text-xs text-gray-500">{showDoneMilestones ? "▼" : "▶"}</span>
+                  </button>
+                  {showDoneMilestones && (
+                    <div className="space-y-1.5">
+                      {items.map((m, i) => (
+                        <div key={i} className="bg-emerald-950/10 border border-emerald-900/20 rounded-xl px-4 py-2.5 flex items-center gap-3 text-xs">
+                          <span>{m.emoji}</span>
+                          <span className="text-gray-400 w-20 shrink-0">{m.deadline}</span>
+                          <span className="text-gray-300 flex-1">{m.label}</span>
+                          <span className="text-gray-600 shrink-0">{m.project}</span>
+                          {m.note && <span className="text-gray-600 truncate max-w-48">{m.note}</span>}
+                        </div>
                       ))}
                     </div>
                   )}
                 </div>
-              ))}
+              );
+            })()}
+          </div>
+        )}
+
+        {/* ================================================================
+            5. 収益（Revenue）
+            ================================================================ */}
+        {view === "revenue" && (
+          <div className="space-y-8">
+            {/* 上段: 3シナリオサマリー */}
+            <div>
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">月間シミュレーション合計</h2>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-red-950/20 border border-red-900/30 rounded-xl p-5 text-center">
+                  <div className="text-xs text-red-400 uppercase mb-1">だめ</div>
+                  <div className="text-3xl font-bold text-red-400">¥{sim.totals.bad.toLocaleString()}</div>
+                </div>
+                <div className="bg-yellow-950/20 border border-yellow-900/30 rounded-xl p-5 text-center">
+                  <div className="text-xs text-yellow-400 uppercase mb-1">普通</div>
+                  <div className="text-3xl font-bold text-yellow-400">¥{sim.totals.normal.toLocaleString()}</div>
+                </div>
+                <div className="bg-emerald-950/20 border border-emerald-900/30 rounded-xl p-5 text-center">
+                  <div className="text-xs text-emerald-400 uppercase mb-1">良い</div>
+                  <div className="text-3xl font-bold text-emerald-400">¥{sim.totals.good.toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 中段: 月別収益ロードマップ（縦棒グラフ） */}
+            <div>
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">月別収益ロードマップ</h2>
+              {/* プロジェクト選択タブ */}
+              <div className="flex gap-1 flex-wrap mb-4">
+                {revenueProjects.map((p, i) => (
+                  <button key={p.id} onClick={() => setSelectedRevenueProject(i)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedRevenueProject === i ? "bg-gray-700 text-white" : "text-gray-500 hover:text-gray-300"}`}>
+                    {p.emoji} {p.name}
+                  </button>
+                ))}
+              </div>
+
+              {revenueProjects[selectedRevenueProject] && (() => {
+                const rp = revenueProjects[selectedRevenueProject];
+                const maxAmount = Math.max(...rp.revenueRoadmap.map((r) => Math.max(r.target, r.actual)), 1);
+                return (
+                  <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-xl">{rp.emoji}</span>
+                      <div>
+                        <h3 className="text-sm font-bold">{rp.name}</h3>
+                        <span className="text-xs text-gray-500">{rp.revenueModel}</span>
+                      </div>
+                    </div>
+                    {/* 棒グラフ */}
+                    <div className="flex items-end gap-2" style={{ height: "220px" }}>
+                      {rp.revenueRoadmap.map((m) => (
+                        <div key={m.month} className="flex-1 flex flex-col items-center gap-1">
+                          <span className="text-[10px] text-gray-400">¥{m.target.toLocaleString()}</span>
+                          <div className="w-full relative rounded-t" style={{ height: `${(m.target / maxAmount) * 180}px` }}>
+                            <div className="absolute bottom-0 w-full bg-gray-700 rounded-t" style={{ height: `${(m.target / maxAmount) * 180}px` }} />
+                            <div className="absolute bottom-0 w-full bg-emerald-500 rounded-t" style={{ height: `${(m.actual / maxAmount) * 180}px` }} />
+                          </div>
+                          <span className="text-[10px] text-gray-500">{m.month.slice(5)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {/* 凡例 */}
+                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
+                      <div className="flex items-center gap-1"><div className="w-3 h-2 bg-gray-700 rounded" />目標</div>
+                      <div className="flex items-center gap-1"><div className="w-3 h-2 bg-emerald-500 rounded" />実績</div>
+                    </div>
+                    {/* breakdown表 */}
+                    <div className="mt-4 border-t border-gray-800 pt-3">
+                      <div className="text-xs text-gray-500 mb-2">内訳</div>
+                      <div className="space-y-2">
+                        {rp.revenueRoadmap.map((m) => (
+                          <div key={m.month}>
+                            <div className="text-xs text-gray-400 mb-1">{m.month}</div>
+                            <div className="flex gap-3 flex-wrap">
+                              {m.breakdown.map((bd, j) => (
+                                <span key={j} className="text-[10px] text-gray-500">
+                                  {bd.source}: ¥{bd.target.toLocaleString()}
+                                  {bd.actual > 0 && <span className="text-emerald-400"> (実績 ¥{bd.actual.toLocaleString()})</span>}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* 下段: 上振れ戦略 */}
+            <div>
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">上振れ戦略</h2>
+              <div className="space-y-4">
+                {upsideStrategies.map((us) => (
+                  <div key={us.project} className="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg">{us.emoji}</span>
+                      <h3 className="text-sm font-bold">{us.project}</h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {us.strategies.map((s, i) => (
+                        <div key={i} className="bg-gray-800/50 rounded-lg px-4 py-3">
+                          <div className="text-sm font-medium text-gray-200">{s.name}</div>
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="text-xs text-emerald-400 font-bold">{s.impact}</span>
+                            <span className="text-[10px] text-gray-500">{s.timing}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* ========== 提案 ========== */}
-        {view === "suggestions" && (
-          <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">AI提案 — 検討すべきこと</h2>
-            {allSuggestions.map((s, i) => (
-              <div key={i} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex gap-3">
-                <span className="text-xl shrink-0">{s.emoji}</span>
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">{s.project}</div>
-                  <div className="text-sm text-gray-300">{s.suggestion}</div>
+        {/* ================================================================
+            6. システム（System）
+            ================================================================ */}
+        {view === "system" && (
+          <div className="space-y-6">
+            {/* 上段: ヘルスサマリー 4カード */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {([
+                { key: "healthy", label: "正常", color: "text-emerald-400", dot: "bg-emerald-500" },
+                { key: "warning", label: "警告", color: "text-amber-400", dot: "bg-amber-500" },
+                { key: "error", label: "エラー", color: "text-red-400", dot: "bg-red-500" },
+                { key: "unknown", label: "未設定", color: "text-gray-400", dot: "bg-gray-500" },
+              ] as const).map((s) => {
+                const count = allHealthItems.filter((h) => h.status === s.key).length;
+                return (
+                  <div key={s.key} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className={`w-2.5 h-2.5 rounded-full ${s.dot}`} />
+                      <span className="text-xs text-gray-500 uppercase">{s.label}</span>
+                    </div>
+                    <div className={`text-3xl font-bold ${s.color}`}>{count}</div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* 中段: プロジェクト別ヘルス */}
+            <div>
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">プロジェクト別ヘルス</h2>
+              {PROJECTS.filter((p) => p.health.length > 0).map((p) => (
+                <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-3">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-xl">{p.emoji}</span>
+                    <h3 className="text-sm font-bold">{p.name}</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {p.health.map((h, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${healthDot[h.status]}`} />
+                        <span className="text-xs text-gray-300 w-48 shrink-0">{h.name}</span>
+                        <span className="text-xs text-gray-500 flex-1 truncate">{h.note || ""}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              ))}
+              {allHealthItems.length === 0 && (
+                <div className="text-center text-gray-500 py-12 text-sm">ヘルス情報なし</div>
+              )}
+            </div>
+
+            {/* 下段: 競合詳細 */}
+            <div>
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">競合分析</h2>
+              {/* プロジェクト選択タブ */}
+              <div className="flex gap-1 flex-wrap mb-4">
+                {PROJECTS.filter((p) => p.competitors.length > 0).map((p, i) => (
+                  <button key={p.id} onClick={() => setSelectedCompetitorProject(i)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedCompetitorProject === i ? "bg-gray-700 text-white" : "text-gray-500 hover:text-gray-300"}`}>
+                    {p.emoji} {p.name}
+                  </button>
+                ))}
               </div>
-            ))}
+
+              {(() => {
+                const competitorProjects = PROJECTS.filter((p) => p.competitors.length > 0);
+                const selected = competitorProjects[selectedCompetitorProject];
+                if (!selected) return null;
+                const analysis = competitorAnalysis[selected.id] || {};
+                return (
+                  <div className="space-y-3">
+                    {selected.competitors.map((c) => {
+                      const expanded = expandedCompetitors.has(c.name);
+                      const ca = analysis[c.name];
+                      return (
+                        <div key={c.name}
+                          className="bg-gray-900 border border-gray-800 rounded-xl p-4 cursor-pointer"
+                          onClick={() => toggleCompetitor(c.name)}>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-sm font-bold text-gray-200">{c.name}</div>
+                              <div className="flex gap-4 mt-1">
+                                <span className="text-xs text-gray-500">ユーザー: {c.users}</span>
+                                <span className="text-xs text-gray-500">課金: {c.pricing}</span>
+                              </div>
+                            </div>
+                            <span className="text-xs text-gray-500">{expanded ? "▼" : "▶"}</span>
+                          </div>
+                          {expanded && ca && (
+                            <div className="mt-3 border-t border-gray-800 pt-3 space-y-2">
+                              <div>
+                                <div className="text-[10px] text-gray-500 uppercase mb-0.5">強み</div>
+                                <div className="text-xs text-gray-400">{ca.strengths}</div>
+                              </div>
+                              <div>
+                                <div className="text-[10px] text-gray-500 uppercase mb-0.5">弱み</div>
+                                <div className="text-xs text-emerald-400/70">{ca.weaknesses}</div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
           </div>
         )}
       </main>
-    </div>
-  );
-}
-
-// ============================================================
-// サブコンポーネント
-// ============================================================
-
-function Card({ label, value, sub }: { label: string; value: string; sub: string }) {
-  return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-      <div className="text-xs text-gray-500 mb-1">{label}</div>
-      <div className="text-xl font-bold">{value}</div>
-      {sub && <div className="text-xs text-gray-600 mt-0.5">{sub}</div>}
-    </div>
-  );
-}
-
-function ProjectDetail({ p }: { p: ProjectData }) {
-  return (
-    <div className="mt-5 pt-5 border-t border-gray-800 space-y-4">
-      {p.pricing && <Section title="課金設定" content={p.pricing} />}
-      {p.pricingFunnel && <Section title="課金動線" content={p.pricingFunnel} />}
-      {p.retention && <Section title="継続率の維持" content={p.retention} />}
-
-      {p.metrics.length > 0 && (
-        <div>
-          <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">メトリクス</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {p.metrics.map((m, i) => (
-              <div key={i} className="bg-gray-800/50 rounded-lg px-3 py-2">
-                <div className="text-xs text-gray-500">{m.label}</div>
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-medium">{m.value}</span>
-                  {m.trend && <span className={`text-xs ${trendColors[m.trend]}`}>{trendIcons[m.trend]}</span>}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {p.weakPoints.length > 0 && (
-        <div>
-          <h4 className="text-xs font-semibold text-red-400 uppercase mb-2">弱点</h4>
-          <ul className="space-y-1">
-            {p.weakPoints.map((w, i) => <li key={i} className="text-xs text-red-300/80 flex gap-2"><span className="text-red-500 shrink-0">!</span>{w}</li>)}
-          </ul>
-        </div>
-      )}
-
-      {p.todos.length > 0 && (
-        <div>
-          <h4 className="text-xs font-semibold text-blue-400 uppercase mb-2">残タスク</h4>
-          <ul className="space-y-1">
-            {p.todos.map((t, i) => (
-              <li key={i} className="text-xs flex gap-2 items-start">
-                <span className={`shrink-0 px-1.5 py-0.5 rounded text-white ${priorityColors[t.priority]}`}>
-                  {t.owner === "auto" ? "自動" : priorityLabels[t.priority]}
-                </span>
-                <span className={t.owner === "auto" ? "text-gray-500" : "text-blue-300/80"}>{t.task}</span>
-                {t.blocked && <span className="text-red-400">(← {t.blocked})</span>}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Section({ title, content }: { title: string; content: string }) {
-  return (
-    <div>
-      <h4 className="text-xs font-semibold text-gray-500 uppercase mb-1">{title}</h4>
-      <p className="text-xs text-gray-400">{content}</p>
     </div>
   );
 }
