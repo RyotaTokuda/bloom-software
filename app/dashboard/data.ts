@@ -31,18 +31,18 @@ export interface AnnualForecast {
 }
 
 export const ANNUAL_FORECAST: AnnualForecast[] = [
-  { month: "2026-04", baseline: 0, upside: 0, actual: 0, catalyst: "基盤構築期。SEOインデックス待ち。記事25本目標" },
-  { month: "2026-05", baseline: 8000, upside: 18000, actual: 0, catalyst: "X運用→初期トラフィック。NOTE有料記事初売上。くらべるラボ初成果" },
-  { month: "2026-06", baseline: 20000, upside: 40000, actual: 0, catalyst: "SEO効果が出始める。NOTE月¥5,000+くらべるラボ月¥8,000+他" },
-  { month: "2026-07", baseline: 35000, upside: 65000, actual: 0, catalyst: "特別単価交渉。NOTEマガジン開始。記事改善サイクル本格化" },
-  { month: "2026-08", baseline: 55000, upside: 95000, actual: 0, catalyst: "NOTE月¥20,000+くらべるラボ月¥25,000+駐車場アプリ月¥8,000" },
-  { month: "2026-09", baseline: 75000, upside: 130000, actual: 0, catalyst: "会計ソフト記事が上位表示。NOTE月¥30,000。アプリ収益安定" },
-  { month: "2026-10", baseline: 90000, upside: 160000, actual: 0, catalyst: "SNSフォロワー1000人。確定申告シーズン準備記事投入" },
-  { month: "2026-11", baseline: 100000, upside: 180000, actual: 0, catalyst: "全プロジェクト合算で月10万達成。年末保険見直し需要" },
-  { month: "2026-12", baseline: 110000, upside: 200000, actual: 0, catalyst: "年末商戦。ふるさと納税関連記事。NOTE年末まとめ記事" },
-  { month: "2027-01", baseline: 140000, upside: 260000, actual: 0, catalyst: "確定申告シーズン突入。freee月5件×¥12,000=¥60,000" },
-  { month: "2027-02", baseline: 160000, upside: 300000, actual: 0, catalyst: "確定申告ピーク。NOTE+くらべるラボ+アプリの3本柱フル稼働" },
-  { month: "2027-03", baseline: 140000, upside: 250000, actual: 0, catalyst: "確定申告ラストスパート。年間通算で月平均¥80,000以上" },
+  { month: "2026-04", baseline: 0, upside: 0, actual: 0, catalyst: "基盤構築期。SEOインデックス待ち。記事25本+NOTE20本目標" },
+  { month: "2026-05", baseline: 8000, upside: 20000, actual: 0, catalyst: "X運用→初期トラフィック。NOTE有料記事初売上。副業ブーム（GW）でAIツール検索増" },
+  { month: "2026-06", baseline: 22000, upside: 45000, actual: 0, catalyst: "SEO効果開始。ボーナス時期→AI有料プラン比較記事。NOTE月¥5,000" },
+  { month: "2026-07", baseline: 38000, upside: 70000, actual: 0, catalyst: "特別単価交渉開始。NOTEマガジン開始。夏休みでAI画像/動画需要↑" },
+  { month: "2026-08", baseline: 58000, upside: 100000, actual: 0, catalyst: "NOTE¥20K+くらべるラボ¥25K+アプリ¥8K。AI自由研究記事" },
+  { month: "2026-09", baseline: 78000, upside: 135000, actual: 0, catalyst: "年末調整準備→会計ソフト需要開始。保険見直し記事投入。NOTE¥30K" },
+  { month: "2026-10", baseline: 95000, upside: 170000, actual: 0, catalyst: "確定申告準備記事先行。ブラックフライデー前のAIツール年額プラン比較記事準備" },
+  { month: "2026-11", baseline: 115000, upside: 210000, actual: 0, catalyst: "🔥ブラックフライデー/サイバーマンデー。ふるさと納税駆け込み。年末保険見直し" },
+  { month: "2026-12", baseline: 125000, upside: 230000, actual: 0, catalyst: "🔥年末商戦ピーク。ふるさと納税ラスト。NOTE年末まとめ。新年準備記事" },
+  { month: "2027-01", baseline: 150000, upside: 280000, actual: 0, catalyst: "🔥🔥確定申告シーズン突入。freee月5件×¥12K。新生活準備→ネット回線" },
+  { month: "2027-02", baseline: 170000, upside: 320000, actual: 0, catalyst: "🔥🔥確定申告ピーク+新生活準備ピーク。引越し見積り+ネット回線が上乗せ" },
+  { month: "2027-03", baseline: 150000, upside: 270000, actual: 0, catalyst: "🔥確定申告ラスト+新生活ラッシュ。年間通算で月平均¥100,000以上" },
 ];
 
 // 上振れ施策（月ごとに何をすれば上に突き抜けるか）
@@ -55,13 +55,27 @@ export interface GrowthLever {
 }
 
 export const GROWTH_LEVERS: GrowthLever[] = [
+  // 通年施策
   { timing: "2026年4-5月", lever: "X(Twitter)運用開始", baselineImpact: "+¥0", upsideImpact: "+¥5,000/月", detail: "AIツール情報を毎日発信。フォロワー500人が月5万PV見込み。記事公開直後のSNS拡散がインデックス速度を加速" },
   { timing: "2026年5-6月", lever: "ASP案件の実績作り→特別単価交渉", baselineImpact: "+¥0", upsideImpact: "+¥15,000/月", detail: "成果3件で担当者に連絡。freee通常¥12,000→特別¥18,000〜¥25,000の実績あり。成果率が同じでも収益1.5〜2倍" },
+  { timing: "2026年5月", lever: "🔥副業ブーム×GW記事（トレンド）", baselineImpact: "+¥3,000/月", upsideImpact: "+¥10,000/月", detail: "GW中に副業を始める人が増加。「副業 AIツール」「ChatGPT 副業」等のKWが急増。NOTE+くらべるラボ両方で記事投入" },
+  { timing: "2026年6月", lever: "🔥ボーナス商戦×AI有料プラン比較", baselineImpact: "+¥2,000/月", upsideImpact: "+¥8,000/月", detail: "ボーナス支給時期に「ChatGPT Plus vs Claude Pro」「AI有料プラン 比較」の検索が増える。年額プランの比較が特に有効" },
   { timing: "2026年6-7月", lever: "計算ツール連携（車の維持費シミュレーター）", baselineImpact: "+¥3,000/月", upsideImpact: "+¥10,000/月", detail: "計算ツール→結果画面で自動車保険見積りに誘導。ツール自体が被リンクを獲得しSEO全体を底上げ" },
   { timing: "2026年7-8月", lever: "NOTEマガジン+シリーズ化", baselineImpact: "+¥2,000/月", upsideImpact: "+¥8,000/月", detail: "月額980円マガジン。10人で月¥9,800。シリーズ化で継続購読率UP" },
+  { timing: "2026年7-8月", lever: "🔥夏休み×AI画像/動画生成（トレンド）", baselineImpact: "+¥2,000/月", upsideImpact: "+¥6,000/月", detail: "夏休みの自由研究・SNS投稿用にAI画像生成の需要急増。「AI イラスト 無料」「AI 動画 作り方」。Canva Proアフィリが刺さる" },
+  // 季節施策
   { timing: "2026年9-10月", lever: "確定申告シーズン準備記事の先行投入", baselineImpact: "+¥5,000/月", upsideImpact: "+¥30,000/月", detail: "「副業 確定申告 やり方」「freee 使い方」等の記事を先行公開。1-3月に検索が10倍になるため、SEO上位を先に取る" },
+  { timing: "2026年9-10月", lever: "🔥年末調整×保険見直し記事", baselineImpact: "+¥3,000/月", upsideImpact: "+¥12,000/月", detail: "「年末調整 保険料控除」「自動車保険 乗り換え」が急増。保険見積り案件¥3,000×月4件=¥12,000" },
   { timing: "2026年10-11月", lever: "高単価案件の追加（プログラミングスクール等）", baselineImpact: "+¥0", upsideImpact: "+¥15,000/月", detail: "1件¥10,000〜¥30,000。AIエンジニア転職系の記事を追加。月1件でも大きい" },
-  { timing: "2027年1-3月", lever: "確定申告シーズン×全施策フル稼働", baselineImpact: "+¥20,000/月", upsideImpact: "+¥60,000/月", detail: "会計ソフト¥12,000×月5件=¥60,000。これだけで月5万超え。他の収益と合わせて月10万〜20万の射程" },
+  { timing: "2026年11月", lever: "🔥🔥ブラックフライデー/サイバーマンデー特集", baselineImpact: "+¥5,000/月", upsideImpact: "+¥25,000/月", detail: "AIツールの年額プランが30-50%OFFになる最大のセール。事前に比較記事を準備→セール開始と同時にSNSで拡散。ChatGPT/Claude/Midjourney/Notion等の全ツール横断比較が最強" },
+  { timing: "2026年11月", lever: "🔥ふるさと納税駆け込み記事", baselineImpact: "+¥3,000/月", upsideImpact: "+¥10,000/月", detail: "12月締切前の11月に検索がピーク。「ふるさと納税 おすすめ」「さとふる 比較」。さとふる/ふるなびは単価¥1,000-3,000だが件数が出る" },
+  { timing: "2026年12月", lever: "🔥年末商戦×新年準備まとめ", baselineImpact: "+¥5,000/月", upsideImpact: "+¥15,000/月", detail: "Amazon年末セール×物販。「来年使いたいAIツール」まとめ記事。NOTE「今年のAI総まとめ」有料記事" },
+  { timing: "2027年1-3月", lever: "🔥🔥確定申告シーズン×全施策フル稼働", baselineImpact: "+¥25,000/月", upsideImpact: "+¥70,000/月", detail: "会計ソフト¥12,000×月5件=¥60,000。新生活準備→ネット回線¥5,000-15,000×月2件。引越し見積り。これだけで月10万射程" },
+  { timing: "2027年2-3月", lever: "🔥新生活準備×ネット回線/引越し", baselineImpact: "+¥5,000/月", upsideImpact: "+¥20,000/月", detail: "「光回線 おすすめ」「引越し 見積もり 比較」。光回線は単価¥5,000-15,000。引越し一括見積りは¥3,000-8,000。新生活シーズンは3月がピーク" },
+  // トレンド施策（2026年最新）
+  { timing: "通年", lever: "🆕AIエージェント比較記事（2026年トレンド）", baselineImpact: "+¥3,000/月", upsideImpact: "+¥12,000/月", detail: "2026年はAIエージェント元年。Claude MCP/OpenAI Agents/Google Agentspace等が続々登場。「AIエージェント 比較」は競合が少なく先行者優位が取れる" },
+  { timing: "通年", lever: "🆕AI動画生成ツール比較（急成長市場）", baselineImpact: "+¥2,000/月", upsideImpact: "+¥8,000/月", detail: "Sora/Runway/Pika/Kling等のAI動画生成が一般化。YouTuber・SNSクリエイター向け比較記事。市場急成長中で競合が少ない" },
+  { timing: "通年", lever: "🆕ローカルAI/プライバシー重視AI（トレンド）", baselineImpact: "+¥1,000/月", upsideImpact: "+¥5,000/月", detail: "企業のAIデータ懸念からローカルLLM（Ollama/LM Studio等）への注目増。「AI ローカル 無料」「ChatGPT 代替 プライバシー」のニッチKW" },
 ];
 
 export interface KPI {
