@@ -264,6 +264,39 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* 売上推移: プロジェクト別シナリオ */}
+            <div>
+              <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">プロジェクト別 売上シナリオ</h2>
+              <div className="space-y-2">
+                {PROJECTS.filter((p) => p.monthlyTarget > 0).sort((a, b) => b.revenue.normal - a.revenue.normal).map((p) => (
+                  <div key={p.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-lg">{p.emoji}</span>
+                      <span className="text-sm font-bold">{p.name}</span>
+                      <span className="text-xs text-gray-500">{p.revenueModel}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="text-center">
+                        <div className="text-[10px] text-red-400 uppercase">だめ</div>
+                        <div className="text-sm font-bold text-red-400">¥{p.revenue.bad.toLocaleString()}</div>
+                        <div className="text-[10px] text-red-300/60 mt-0.5">{p.revenue.badNote}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[10px] text-yellow-400 uppercase">普通</div>
+                        <div className="text-sm font-bold text-yellow-400">¥{p.revenue.normal.toLocaleString()}</div>
+                        <div className="text-[10px] text-yellow-300/60 mt-0.5">{p.revenue.normalNote}</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[10px] text-emerald-400 uppercase">良い</div>
+                        <div className="text-sm font-bold text-emerald-400">¥{p.revenue.good.toLocaleString()}</div>
+                        <div className="text-[10px] text-emerald-300/60 mt-0.5">{p.revenue.goodNote}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* 中段: プロジェクト行 */}
             <div>
               <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">プロジェクト</h2>
