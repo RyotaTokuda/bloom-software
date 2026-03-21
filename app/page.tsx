@@ -103,10 +103,10 @@ const SERVICES: Service[] = [
       "領収書・レシート・請求書をスマホで撮影して管理。確定申告や経費精算の時期に慌てないための整理ツール。",
     detail:
       "撮影するだけでOCRが日付・金額・店名を自動抽出。カテゴリ分類・タグ付け・CSV出力で確定申告の準備がラクに。保証書や保険証券の管理にも。クラウド同期で安心バックアップ。",
-    status: "soon",
-    statusLabel: "開発計画中",
-    cardClass: "bg-gray-50 border-gray-100",
-    badgeClass: "bg-gray-300 text-gray-600",
+    status: "wip",
+    statusLabel: "MVP完了・リリース準備中",
+    cardClass: "bg-orange-50 border-orange-100",
+    badgeClass: "bg-orange-500 text-white",
   },
   {
     emoji: "🚗",
