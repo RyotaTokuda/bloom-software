@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   PROJECTS,
   getRevenueSimulation,
@@ -113,7 +113,10 @@ const upsideStrategies: { project: string; emoji: string; strategies: { name: st
 // Component
 // ------------------------------------------------------------
 
-export function DashboardClient({ liveData }: { liveData: LiveDashboardData }) {
+const POLL_INTERVAL = 60_000; // 60秒
+
+export function DashboardClient({ liveData: initialData }: { liveData: LiveDashboardData }) {
+  const [liveData, setLiveData] = useState(initialData);
   const [view, setView] = useState<View>("overview");
   const [selectedKpiProject, setSelectedKpiProject] = useState(0);
   const [selectedRevenueProject, setSelectedRevenueProject] = useState(0);
@@ -123,6 +126,18 @@ export function DashboardClient({ liveData }: { liveData: LiveDashboardData }) {
   const [expandedTodos, setExpandedTodos] = useState<Set<string>>(new Set());
   const [expandedLevers, setExpandedLevers] = useState<Set<string>>(new Set());
   const [expandedIssues, setExpandedIssues] = useState<Set<string>>(new Set());
+
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch("/api/dashboard");
+      if (res.ok) setLiveData(await res.json());
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(refresh, POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [refresh]);
 
   const { issues, ciStatuses, prs } = liveData;
   const hasToken = issues.length > 0 || ciStatuses.length > 0 || prs.length > 0;
@@ -591,32 +606,33 @@ export function DashboardClient({ liveData }: { liveData: LiveDashboardData }) {
                 </div>
                 {(() => {
                   const maxVal = Math.max(...ANNUAL_FORECAST.map((f) => Math.max(f.baseline, f.upside, f.actual)), 1);
-                  const targetLine = 120000;
-                  const targetPct = (targetLine / maxVal) * 200;
+                  const chartH = 180;
+                  const targetPx = (120000 / maxVal) * chartH;
                   return (
-                    <div className="relative" style={{ height: "240px" }}>
-                      <div className="absolute left-0 right-0 border-t-2 border-dashed border-amber-500/50" style={{ bottom: `${targetPct + 20}px` }}>
+                    <div className="relative">
+                      {/* 目標ライン */}
+                      <div className="absolute left-0 right-0 border-t-2 border-dashed border-amber-500/50 z-10 pointer-events-none" style={{ bottom: `${targetPx + 24}px` }}>
                         <span className="absolute right-0 -top-4 text-[10px] text-amber-400">¥120,000</span>
                       </div>
-                      <div className="flex items-end gap-1.5 h-full pt-6">
-                        {ANNUAL_FORECAST.map((f) => (
-                          <div key={f.month} className="flex-1 flex flex-col items-center gap-0.5">
-                            <span className="text-[9px] text-blue-400">¥{(f.upside / 1000).toFixed(0)}k</span>
-                            <span className="text-[9px] text-gray-500">¥{(f.baseline / 1000).toFixed(0)}k</span>
-                            <div className="w-full flex gap-px justify-center" style={{ height: `${(f.upside / maxVal) * 180}px` }}>
-                              <div className="w-1/3 flex flex-col justify-end">
-                                <div className="bg-gray-600 rounded-t" style={{ height: `${f.baseline > 0 ? (f.baseline / f.upside) * 100 : 0}%` }} />
+                      {/* バー */}
+                      <div className="flex gap-1" style={{ height: `${chartH + 48}px`, alignItems: "flex-end" }}>
+                        {ANNUAL_FORECAST.map((f) => {
+                          const baseH = (f.baseline / maxVal) * chartH;
+                          const upH = (f.upside / maxVal) * chartH;
+                          const actH = f.actual > 0 ? (f.actual / maxVal) * chartH : 0;
+                          return (
+                            <div key={f.month} className="flex-1 flex flex-col items-center" style={{ minWidth: 0 }}>
+                              <span className="text-[9px] text-blue-400 mb-0.5">¥{(f.upside / 1000).toFixed(0)}k</span>
+                              <span className="text-[9px] text-gray-500 mb-1">¥{(f.baseline / 1000).toFixed(0)}k</span>
+                              <div className="w-full flex gap-px" style={{ height: `${Math.max(upH, 2)}px`, alignItems: "flex-end" }}>
+                                <div className="bg-gray-600 rounded-t" style={{ flex: 1, height: `${Math.max(baseH, f.baseline > 0 ? 2 : 0)}px` }} />
+                                <div className="bg-blue-500/60 rounded-t" style={{ flex: 1, height: `${Math.max(upH, f.upside > 0 ? 2 : 0)}px` }} />
+                                <div className="bg-emerald-500 rounded-t" style={{ flex: 1, height: `${Math.max(actH, f.actual > 0 ? 2 : 0)}px` }} />
                               </div>
-                              <div className="w-1/3 flex flex-col justify-end">
-                                <div className="bg-blue-500/60 rounded-t" style={{ height: "100%" }} />
-                              </div>
-                              <div className="w-1/3 flex flex-col justify-end">
-                                <div className="bg-emerald-500 rounded-t" style={{ height: `${f.actual > 0 && f.upside > 0 ? (f.actual / f.upside) * 100 : 0}%` }} />
-                              </div>
+                              <span className="text-[9px] text-gray-500 mt-1">{f.month.slice(5)}月</span>
                             </div>
-                            <span className="text-[9px] text-gray-500">{f.month.slice(5)}月</span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   );
@@ -657,17 +673,23 @@ export function DashboardClient({ liveData }: { liveData: LiveDashboardData }) {
                         <span className="text-xs text-gray-500">{rp.revenueModel}</span>
                       </div>
                     </div>
-                    <div className="flex items-end gap-2" style={{ height: "220px" }}>
-                      {rp.revenueRoadmap.map((m) => (
-                        <div key={m.month} className="flex-1 flex flex-col items-center gap-1">
-                          <span className="text-[10px] text-gray-400">¥{m.target.toLocaleString()}</span>
-                          <div className="w-full relative rounded-t" style={{ height: `${(m.target / maxAmount) * 180}px` }}>
-                            <div className="absolute bottom-0 w-full bg-gray-700 rounded-t" style={{ height: `${(m.target / maxAmount) * 180}px` }} />
-                            <div className="absolute bottom-0 w-full bg-emerald-500 rounded-t" style={{ height: `${(m.actual / maxAmount) * 180}px` }} />
+                    <div className="flex gap-2" style={{ height: "220px", alignItems: "flex-end" }}>
+                      {rp.revenueRoadmap.map((m) => {
+                        const tgtH = (m.target / maxAmount) * 180;
+                        const actH = (m.actual / maxAmount) * 180;
+                        return (
+                          <div key={m.month} className="flex-1 flex flex-col items-center" style={{ minWidth: 0 }}>
+                            <span className="text-[10px] text-gray-400 mb-1">¥{m.target.toLocaleString()}</span>
+                            <div className="w-full relative" style={{ height: `${Math.max(tgtH, 2)}px` }}>
+                              <div className="absolute bottom-0 left-0 right-0 bg-gray-700 rounded-t" style={{ height: `${Math.max(tgtH, 2)}px` }} />
+                              {m.actual > 0 && (
+                                <div className="absolute bottom-0 left-0 right-0 bg-emerald-500 rounded-t" style={{ height: `${Math.max(actH, 2)}px` }} />
+                              )}
+                            </div>
+                            <span className="text-[10px] text-gray-500 mt-1">{m.month.slice(5)}</span>
                           </div>
-                          <span className="text-[10px] text-gray-500">{m.month.slice(5)}</span>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                     <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
                       <div className="flex items-center gap-1"><div className="w-3 h-2 bg-gray-700 rounded" />目標</div>
