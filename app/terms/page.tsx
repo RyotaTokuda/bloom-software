@@ -170,6 +170,7 @@ export default function TermsPage() {
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-gray-600 transition-colors">プライバシーポリシー</Link>
             <Link href="/terms" className="text-gray-600">利用規約</Link>
+            <Link href="/tokushoho" className="hover:text-gray-600 transition-colors">特定商取引法</Link>
           </div>
         </div>
       </footer>

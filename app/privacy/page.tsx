@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "プライバシーポリシー | Mankai Software",
 };
 
-const UPDATED_AT = "2026年5月6日";
+const UPDATED_AT = "2026年5月11日";
 
 export default function PrivacyPage() {
   return (
@@ -45,6 +45,8 @@ export default function PrivacyPage() {
                 <li>解析に使用した画像のファイルパス</li>
                 <li>解析・利用履歴</li>
                 <li>アプリ内の設定情報</li>
+                <li>【しめどき】会議・セッションのテンプレート情報（タイトル・時間・設定等）</li>
+                <li>【しめどき】セッションの記録（開始時刻・終了時刻・完了状況等）</li>
                 <li>【痛み手帳】不調の記録（症状種類・強さ・服薬情報・メモ・記録日時等）</li>
                 <li>【痛み手帳】記録時の環境データ（気圧・天気・気温・湿度・空気質等）</li>
                 <li>【痛み手帳】Apple Healthデータの要約（睡眠時間・安静時心拍・歩数等）</li>
@@ -214,6 +216,7 @@ export default function PrivacyPage() {
           <div className="flex gap-6">
             <Link href="/privacy" className="text-gray-600">プライバシーポリシー</Link>
             <Link href="/terms" className="hover:text-gray-600 transition-colors">利用規約</Link>
+            <Link href="/tokushoho" className="hover:text-gray-600 transition-colors">特定商取引法</Link>
           </div>
         </div>
       </footer>
