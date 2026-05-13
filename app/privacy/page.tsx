@@ -5,7 +5,21 @@ export const metadata: Metadata = {
   title: "プライバシーポリシー | Mankai Software",
 };
 
-const UPDATED_AT = "2026年5月11日";
+const UPDATED_AT = "2026年5月14日";
+
+const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
+  <section id={id}>
+    <h2 className="text-base font-bold text-gray-900 mb-3">{title}</h2>
+    {children}
+  </section>
+);
+
+const Sub = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div className="mt-5">
+    <h3 className="font-semibold text-gray-800 mb-2">{title}</h3>
+    {children}
+  </div>
+);
 
 export default function PrivacyPage() {
   return (
@@ -24,213 +38,196 @@ export default function PrivacyPage() {
           <h1 className="text-2xl font-bold mb-2">プライバシーポリシー</h1>
           <p className="text-sm text-gray-400 mb-10">最終更新日：{UPDATED_AT}</p>
 
-          <div className="prose prose-gray max-w-none space-y-8 text-sm leading-7 text-gray-700">
+          <div className="space-y-8 text-sm leading-7 text-gray-700">
 
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">1. はじめに</h2>
+            <Section id="s1" title="1. はじめに・適用範囲">
               <p>
-                Mankai Software（以下「当方」）は、当方が提供するスマートフォンアプリケーション及びウェブサービス（以下総称して「本サービス」）において、ユーザーのプライバシーを尊重し、個人情報の適切な保護に努めます。
-                本プライバシーポリシーは、本サービスにおける情報の収集・利用・管理方針について説明するものです。
-                本サービスをご利用いただくことで、本ポリシーの内容に同意したものとみなします。
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">2. 収集する情報</h2>
-
-              <h3 className="font-semibold text-gray-800 mb-2">2-1. 端末内にのみ保存される情報</h3>
-              <p>当方が提供する各アプリおよびウェブサービスは、機能提供のために以下の種類のデータをユーザーの端末内にのみ保存します。</p>
-              <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>アプリ内に入力した各種データ（記録・設定・履歴等）</li>
-                <li>本サービスの利用状況に関する情報</li>
-              </ul>
-              <p className="mt-3">保存されるデータの具体的な内容はサービスにより異なります。これらのデータは端末内のストレージにのみ保存され、当方のサーバーへは送信されません。</p>
-
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">2-2. 解析のために外部サービスへ送信される情報</h3>
-              <p>
-                「看板を読み取る」等の解析機能をご利用の際、撮影または選択した画像データを、当方が利用する外部AIサービス（後述）へ送信します。
-                この画像には、ナンバープレートや人物等が偶発的に含まれる可能性があります。
-                解析目的以外に当方がこのデータを保存・蓄積することはありません。
-              </p>
-
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">2-3. アプリ別 外部サービス利用一覧</h3>
-              <p>
-                外部サービスを利用するのは以下のアプリに限られます。記載のないアプリは、課金処理（後述）を除き、外部サーバーとの通信を行いません。
-              </p>
-              <div className="overflow-x-auto mt-3">
-                <table className="text-xs border-collapse min-w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="py-2 pr-4 text-left font-semibold text-gray-700">アプリ</th>
-                      <th className="py-2 pr-4 text-left font-semibold text-gray-700">利用サービス</th>
-                      <th className="py-2 text-left font-semibold text-gray-700">目的</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-gray-700">
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2 pr-4 align-top">買いどき</td>
-                      <td className="py-2 pr-4 align-top">Apple CloudKit</td>
-                      <td className="py-2 align-top">端末間・家族間のデータ同期（詳細は §2-6）</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2 pr-4 align-top">痛み手帳</td>
-                      <td className="py-2 pr-4 align-top">Apple HealthKit（端末内のみ）</td>
-                      <td className="py-2 align-top">健康データ読み取り（外部送信なし。詳細は §2-7）</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2 pr-4 align-top">駐車料金リーダー</td>
-                      <td className="py-2 pr-4 align-top">Google Gemini API、PostHog</td>
-                      <td className="py-2 align-top">看板画像の解析（§4-1）、利用状況の匿名分析（§2-4）</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2 pr-4 align-top">しめどき / ローカルファイル変換 / ファイルコンバーター</td>
-                      <td className="py-2 pr-4 align-top">なし</td>
-                      <td className="py-2 align-top">外部サービスとの通信は行いません</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <p className="mt-3 text-xs text-gray-500">
-                本一覧は最終更新日時点の情報です。新たに外部サービスを利用する場合は本ポリシーを改定し、必要に応じてアプリ内で告知します。
-              </p>
-
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">2-4. 利用状況の分析（駐車料金リーダーのみ）</h3>
-              <p>
-                駐車料金リーダーは、サービス品質向上のため、PostHog Inc.（米国）が提供するアナリティクスサービスを利用し、アプリの利用状況（画面遷移・機能の利用頻度・エラー発生状況等）を匿名で収集する場合があります。氏名・連絡先など個人を特定できる情報は収集しません。
-              </p>
-              <p className="mt-2 text-xs text-gray-500">
-                その他のアプリ（買いどき・痛み手帳・しめどき・ローカルファイル変換）には PostHog を含む第三者アナリティクスSDKを組み込んでおりません。
-              </p>
-
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">2-4-1. 課金・決済</h3>
-              <p>
-                有料機能の課金処理は Apple（App Store）の決済システムを通じて行われ、クレジットカード番号等の決済情報を当方が直接取得・保存することはありません。お支払い方法・タイミングは Apple の規約に準じます。
-              </p>
-              <p className="mt-2 text-xs text-gray-500">
-                現時点では RevenueCat 等のサードパーティ課金SDKは利用していません。将来導入する場合は本ポリシーを改定し、対象アプリと送信される情報の範囲を明記します。
-              </p>
-
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">2-5. 収集しない情報</h3>
-              <p>当方は以下の情報を収集しません。</p>
-              <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>住所・電話番号等の連絡先情報（メールアドレスを除く）</li>
-                <li>正確な位置情報（痛み手帳は市区町村レベルの近似値のみ端末内に保存します）</li>
-                <li>端末の識別情報</li>
-                <li>クレジットカード番号等の決済情報（決済は App Store / Google Play が処理します）</li>
-                <li>健康記録・Apple Healthデータそのもの（端末外への送信は行いません）</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">2-6. 買いどき における CloudKit データ同期</h2>
-              <p>
-                「買いどき」アプリは、Apple の CloudKit（iCloud）を使用して、消耗品データおよび買い物リストを端末間・家族間で同期します。
-                CloudKit に保存されるデータは、消耗品情報・買い物リスト・設定情報のみです。
-                これらのデータは Apple の iCloud インフラ上に保存され、当方のサーバーへは送信されません。
-                CloudKit の利用には Apple ID が必要です。データの取り扱いについては Apple のプライバシーポリシーが適用されます。
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">2-7. 痛み手帳における健康データの取り扱い</h2>
-              <p>
-                「痛み手帳」アプリは、Apple HealthKit を通じて睡眠時間・安静時心拍・歩数等の健康データを読み取り、不調との傾向を表示する目的のみに使用します。
-                これらのデータは端末内にのみ保存され、当方のサーバーや第三者へ送信されることはありません。
-                HealthKit データを広告・マーケティング・市場調査等の目的で使用することはありません。
+                得田涼太（屋号：Mankai Software、以下「当方」）は、当方が提供するスマートフォンアプリケーションおよびウェブサービス（以下総称して「本サービス」）において、ユーザーのプライバシーを尊重し、個人情報の適切な保護に努めます。
               </p>
               <p className="mt-3">
-                <strong>本アプリは医療機器ではありません。</strong>
-                痛み手帳の記録・分析結果は参考情報であり、診断・治療・予防を目的とするものではありません。
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">3. カメラおよびフォトライブラリへのアクセス</h2>
-              <p>
-                本サービスの一部は、標識・書類等を撮影・選択する機能のために、カメラおよびフォトライブラリへのアクセス許可を求めます。
-                取得した画像は解析目的のみに使用し、ユーザーの同意なく外部へ公開・共有することはありません。
-                アクセス許可はOS設定からいつでも取り消すことができます。
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">4. 外国にある第三者への個人情報の提供</h2>
-              <p>
-                <strong>本項は「駐車料金リーダー」アプリのみ該当します。</strong>ローカルファイル変換等、サーバーへのデータ送信を行わないサービスには適用されません。
+                本プライバシーポリシーは、本サービス全体に適用される情報の収集・利用・管理方針を説明します。各アプリが具体的にどのデータを収集するかは、App Storeの各アプリページ「プライバシー」欄（App Privacyラベル）もあわせてご確認ください。
               </p>
               <p className="mt-3">
-                駐車料金リーダーは、看板画像の解析のために Google LLC（米国、以下「Google」）が提供するGemini API（生成AIサービス）を利用しており、画像データをGoogleのサーバーへ送信します。これは個人情報保護法第24条に基づく外国にある第三者への提供に該当する場合があります。
+                本サービスをご利用いただくことで、本ポリシーに同意したものとみなします。
               </p>
-              <p className="mt-3">Googleは、EUのGDPRをはじめとする国際的な個人情報保護基準に準拠した適切な保護措置を講じています。詳細はGoogleのプライバシーポリシーをご参照ください。</p>
-              <p className="mt-3">
-                <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                  https://policies.google.com/privacy
-                </a>
-              </p>
+            </Section>
 
-              <h3 className="font-semibold text-gray-800 mt-5 mb-2">4-1. Gemini API のデータ利用に関する重要事項</h3>
-              <p>
-                駐車料金リーダーは Gemini API の有料プランを使用しています。有料プランでは、送信されたデータがGoogleのAI開発改善に利用されることはありません。
-                ただし、個人情報・機密情報・プライバシーに関わる内容が映り込んだ画像の送信はお控えください。
-              </p>
-            </section>
+            <Section id="s2" title="2. 収集する情報の種類">
+              <Sub title="2-1. 端末内にのみ保存される情報（全サービス共通）">
+                <p>
+                  本サービスは、機能提供のためにユーザーが入力・生成したデータ（記録・設定・履歴等）を、原則としてユーザーの端末内にのみ保存します。これらのデータは当方のサーバーへは送信されません。
+                </p>
+              </Sub>
 
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">5. 情報の利用目的</h2>
+              <Sub title="2-2. AI・解析機能のために外部送信される情報">
+                <p>
+                  AI解析・自動認識等の機能を提供するサービスでは、処理対象のデータ（画像・テキスト等）を外部のAI/APIサービスへ送信します。送信されるデータの具体的な内容は各サービスの機能に依存します。当方はこのデータを解析目的以外に保存・蓄積しません。
+                </p>
+                <p className="mt-2 text-xs text-gray-500">
+                  どのサービスがAI機能を使用するかはApp Storeの各アプリページをご確認ください。
+                </p>
+              </Sub>
+
+              <Sub title="2-3. クラウド同期のために共有される情報">
+                <p>
+                  端末間・家族間のデータ同期機能を持つサービスでは、同期対象のデータをApple iCloud（CloudKit）上に保存します。このデータは当方のサーバーへは送信されず、Appleのプライバシーポリシーが適用されます。同期機能を使用するためにはApple IDが必要です。
+                </p>
+              </Sub>
+
+              <Sub title="2-4. 健康データの取り扱い">
+                <p>
+                  健康記録機能を持つサービスでは、ユーザーの同意のもとApple HealthKitを通じて健康データ（睡眠・心拍・歩数等）を読み取り、傾向表示の目的のみに使用します。これらのデータは端末内にのみ保存され、当方のサーバーや第三者へ送信されることはありません。健康データを広告・マーケティング・市場調査の目的で使用しません。
+                </p>
+              </Sub>
+
+              <Sub title="2-5. アナリティクス情報">
+                <p>
+                  サービス品質向上のため、一部のサービスではアプリの利用状況（画面遷移・機能の利用頻度・エラー発生状況等）を匿名で収集するアナリティクスツールを使用することがあります。氏名・連絡先など個人を特定できる情報は収集しません。
+                </p>
+                <p className="mt-2 text-xs text-gray-500">
+                  アナリティクスを使用するサービスはApp Storeの各アプリページに記載しています。
+                </p>
+              </Sub>
+
+              <Sub title="2-6. 課金・決済情報">
+                <p>
+                  有料機能の決済はApple（App Store）の決済システムを通じて行われます。クレジットカード番号等の決済情報を当方が直接取得・保存することはありません。
+                </p>
+              </Sub>
+
+              <Sub title="2-7. お問い合わせ時の情報">
+                <p>
+                  サポートへのお問い合わせの際、メールアドレスおよびお問い合わせ内容を取得します。これらの情報はお問い合わせへの対応目的のみに使用し、第三者への提供は行いません。
+                </p>
+              </Sub>
+            </Section>
+
+            <Section id="s3" title="3. 情報の利用目的">
               <p>当方が取得する情報は、以下の目的にのみ使用します。</p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li>本サービスの機能提供（料金解析・結果表示等）</li>
-                <li>本サービスの品質維持・改善</li>
+                <li>本サービスの機能提供および正常動作の確保</li>
+                <li>本サービスの品質維持・改善・新機能開発</li>
                 <li>ユーザーからのお問い合わせへの対応</li>
+                <li>法令上必要な対応</li>
               </ul>
-            </section>
+              <p className="mt-3">
+                上記目的の範囲を超えて情報を利用する場合は、事前にユーザーの同意を得るか、本ポリシーを改定して告知します。
+              </p>
+            </Section>
 
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">6. 情報の管理・削除</h2>
+            <Section id="s4" title="4. 外部サービスとの情報共有">
               <p>
-                本サービスは、当方のサーバーにユーザーデータを保存しません。そのため、当方によるデータ削除の対応は行いません。
+                当方が利用する主な外部サービスは以下のとおりです。各サービスのプライバシーポリシーも併せてご確認ください。
+              </p>
+
+              <Sub title="4-1. AI・解析サービス">
+                <p>
+                  AI解析機能を提供するサービスでは、Google LLC（米国）が提供するAI APIを使用します。解析対象データはGoogleのサーバーへ送信されます。有料APIプランを使用しているため、送信データがGoogleのAIモデル改善に利用されることはありません。
+                </p>
+                <p className="mt-2">
+                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                    Google プライバシーポリシー
+                  </a>
+                </p>
+              </Sub>
+
+              <Sub title="4-2. クラウド同期サービス">
+                <p>
+                  データ同期機能を提供するサービスでは、Apple Inc.のCloudKit（iCloud）を使用します。CloudKitに保存されるデータはAppleのプライバシーポリシーが適用されます。
+                </p>
+                <p className="mt-2">
+                  <a href="https://www.apple.com/jp/legal/privacy/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                    Apple プライバシーポリシー
+                  </a>
+                </p>
+              </Sub>
+
+              <Sub title="4-3. アナリティクスサービス">
+                <p>
+                  アナリティクスを導入しているサービスでは、PostHog Inc.（米国）のサービスを使用することがあります。収集されるのは匿名の利用状況データのみです。
+                </p>
+                <p className="mt-2">
+                  <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                    PostHog プライバシーポリシー
+                  </a>
+                </p>
+              </Sub>
+
+              <Sub title="4-4. 上記以外の第三者提供">
+                <p>
+                  以下の場合を除き、ユーザーの情報を第三者に提供しません。
+                </p>
+                <ul className="list-disc pl-5 mt-2 space-y-1">
+                  <li>ユーザーの同意がある場合</li>
+                  <li>法令に基づく開示請求がある場合</li>
+                  <li>人の生命・身体・財産の保護のために必要で、ユーザーの同意取得が困難な場合</li>
+                </ul>
+              </Sub>
+            </Section>
+
+            <Section id="s5" title="5. 外国にある第三者への提供（個人情報保護法第28条）">
+              <p>
+                AI解析機能等を通じてデータを外部APIへ送信するサービスでは、Google LLC（米国）等の外国にある第三者へ情報が提供されます。これらの事業者は、EUのGDPRや標準契約条項（SCC）等、国際的な個人情報保護基準に準拠した適切な保護措置を講じています。
+              </p>
+              <p className="mt-3">
+                外部APIへの送信が発生するサービスと送信されるデータの内容については、App Storeの各アプリページをご確認ください。
+              </p>
+            </Section>
+
+            <Section id="s6" title="6. 収集しない情報">
+              <p>当方は以下の情報を収集しません。</p>
+              <ul className="list-disc pl-5 mt-2 space-y-1">
+                <li>氏名・住所・電話番号（お問い合わせ対応に必要な場合を除く）</li>
+                <li>正確な位置情報（位置情報を扱うサービスでも近似値のみ端末内に保存）</li>
+                <li>端末の一意識別子（広告ID等）</li>
+                <li>クレジットカード番号等の決済情報</li>
+                <li>健康データの外部サーバーへの保存・送信</li>
+              </ul>
+            </Section>
+
+            <Section id="s7" title="7. カメラ・フォトライブラリ・マイクへのアクセス">
+              <p>
+                撮影・録音・ファイル選択等の機能を持つサービスでは、カメラ・フォトライブラリ・マイク等へのアクセス許可を求めることがあります。取得したデータは当該機能の提供目的のみに使用し、ユーザーの同意なく外部へ公開・共有しません。アクセス許可はOS設定からいつでも取り消せます。
+              </p>
+            </Section>
+
+            <Section id="s8" title="8. 情報の管理・削除">
+              <p>
+                当方はユーザーデータをサーバーに保存しないため、当方側でのデータ削除対応は行いません。
               </p>
               <ul className="list-disc pl-5 mt-2 space-y-1">
-                <li><strong>アプリ（スマートフォン）：</strong>端末内に保存されたデータはアプリのアンインストールにより削除されます。アプリ内の設定から履歴・保存データを任意に削除することもできます。</li>
-                <li><strong>Webサービス（ローカルファイル変換等）：</strong>ファイルデータはブラウザ内のみで処理され、当方のサーバーへは送信・保存されません。ブラウザを閉じると同時にデータは消去されます。</li>
+                <li><strong>アプリ：</strong>アプリのアンインストールにより端末内データが削除されます。アプリ内の設定画面から任意に削除することもできます。</li>
+                <li><strong>Webサービス：</strong>処理はブラウザ内のみで行われ、ブラウザを閉じると同時にデータは消去されます。</li>
+                <li><strong>iCloud同期データ：</strong>端末のiCloud設定またはアプリ内の設定から削除できます。</li>
               </ul>
-            </section>
+            </Section>
 
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">7. 未成年者の利用</h2>
+            <Section id="s9" title="9. 未成年者の利用">
               <p>
-                本サービスは13歳未満のお子様を対象としていません。
-                13歳未満のお子様の個人情報を故意に収集することはありません。
-                13歳未満のお子様が本サービスを利用していることが判明した場合、当該データを速やかに削除します。
+                本サービスは13歳未満を対象としていません。13歳未満のお子様の個人情報を故意に収集することはなく、収集していることが判明した場合は速やかに削除します。各アプリのApp Store年齢区分もご確認ください。
               </p>
-            </section>
+            </Section>
 
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">8. 免責事項</h2>
+            <Section id="s10" title="10. セキュリティ">
               <p>
-                当方は、本サービスにおける情報の取り扱いについて善意かつ合理的な注意を払いますが、当方の故意または重過失に起因する場合を除き、本サービスの利用に関連してユーザーに生じた損害について責任を負いません。
-                ユーザーが送信した画像データの第三者サービス（Google等）における取り扱いについては、各サービスのプライバシーポリシーが適用され、当方は責任を負いません。
+                当方は、取り扱う情報の漏洩・滅失・毀損の防止に合理的な技術的・組織的安全管理措置を講じます。ただし、インターネット上の通信やサードパーティサービスのセキュリティについて、完全な安全性を保証することはできません。
               </p>
-            </section>
+            </Section>
 
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">9. プライバシーポリシーの変更</h2>
+            <Section id="s11" title="11. プライバシーポリシーの変更">
               <p>
-                当方は、法令の改正・サービス内容の変更等に伴い、本ポリシーを変更することがあります。
-                重要な変更がある場合は本ページへの掲載およびアプリ内での通知により告知します。
-                変更後に本サービスをご利用いただいた場合、変更後のポリシーに同意したものとみなします。
+                当方は、法令の改正・サービス内容の変更等に伴い、本ポリシーを変更することがあります。ユーザーの権利に実質的な影響を与える重要な変更の場合は、アプリ内または本ウェブサイト上で事前に告知します。変更後に本サービスをご利用いただいた場合、変更後のポリシーに同意したものとみなします。
               </p>
-            </section>
+            </Section>
 
-            <section>
-              <h2 className="text-base font-bold text-gray-900 mb-3">10. お問い合わせ</h2>
-              <p>本ポリシーに関するご質問・ご意見・個人情報の取り扱いに関するお問い合わせは、以下のメールアドレスにてお受けします。</p>
+            <Section id="s12" title="12. お問い合わせ">
+              <p>本ポリシーに関するご質問・個人情報の取り扱いに関するお問い合わせは、以下にてお受けします。</p>
               <p className="mt-2">
                 <a href="mailto:mankaisoftware.info@gmail.com" className="text-blue-600 underline">
                   mankaisoftware.info@gmail.com
                 </a>
               </p>
-            </section>
+            </Section>
 
           </div>
         </div>
